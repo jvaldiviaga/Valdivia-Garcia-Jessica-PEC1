@@ -1,0 +1,2583 @@
+---
+title: "PEC1_ValdiviaGarcia_Jessica_ADO"
+author: "Jessica Valdivia Garcia"
+date: "2024-11-12"
+output:
+  html_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(fig.width=10, fig.height=6, cache=FALSE, 
+                      echo=TRUE, warning=FALSE, message=FALSE, results ='markup')
+options(warn=-1, width=100)
+```
+
+Para proceder al análisis de los datos de proteómica contenidos en el dataset 'Phosphoproteomics' vamos a plantear una serie de cuestiones que caractericen el proceso de análisis para realizarlo de la forma más clara, ordenada y eficaz.
+
+#### **1. Cuestiones Relacionadas con la Pregunta Biológica y el Objetivo del Estudio**
+
+En esta primera sección, debemos centrar la respuesta en la motivación biológica del estudio y en cómo se va a abordar cada pregunta, indicando en qué secciones específicas del análisis se aplicarán las técnicas o funciones correspondientes. El análisis estadístico detallado vendrá más adelante, en su propia sección.
+
+Así, las cuestiones relacionadas con la pregunta biológica serían:
+
+- **¿Cuál fue la pregunta clave que motivó este estudio?**
+- **¿Cuáles son las diferencias clave en los niveles de fosfopéptidos entre los subtipos tumorales MSS y PD?**
+- **¿Qué rutas de señalización podrían estar más activas o reprimidas en los subtipos MSS y PD en función de los patrones de fosforilación?**
+- **¿Existen fosfopéptidos específicos que puedan actuar como biomarcadores para distinguir los subtipos tumorales MSS y PD?**
+- **¿Qué implicaciones clínicas y terapéuticas podrían tener las diferencias en los niveles de fosforilación entre estos subtipos?**
+
+---
+
+##### **¿Cuál fue la pregunta clave que motivó este estudio?**
+
+La pregunta principal que motivó este estudio fue determinar si los niveles de fosforilación de proteínas, representados por la abundancia de fosfopéptidos, permiten diferenciar entre los subtipos tumorales MSS (estable en microsatélites) y PD  (fenotipo de poliposis serrada) en cáncer colorrectal. La fosforilación es una modificación postraduccional fundamental para la regulación de múltiples vías de señalización celular y desempeña un papel clave en procesos como proliferación, apoptosis y migración celular. El estudio buscó identificar si estas diferencias pueden revelar patrones moleculares únicos entre ambos subtipos y, potencialmente, señalar biomarcadores que permitan una clasificación más precisa y el desarrollo de estrategias terapéuticas personalizadas.
+
+---
+
+##### **1.1 ¿Cuáles son las diferencias clave en los niveles de fosfopéptidos entre los subtipos tumorales MSS y PD?**
+
+Los análisis identificaron diferencias significativas en los niveles de fosforilación entre MSS y PD, destacando la naturaleza más agresiva y heterogénea del subtipo PD. Este mostró una mayor abundancia de fosfopéptidos en vías relacionadas con proliferación celular y remodelación del citoesqueleto, como la vía MAPK/ERK. Por el contrario, MSS presentó perfiles más homogéneos, asociados a procesos metabólicos y regulación del ciclo celular, reflejando un comportamiento menos agresivo.
+
+Estas diferencias fueron detectadas mediante el análisis de datos de fosfoproteómica obtenidos por espectrometría de masas (LC-MS/MS), preprocesados para corregir variabilidad técnica y garantizar la confiabilidad. El análisis estadístico, realizado con el paquete `limma`, identificó fosfopéptidos diferencialmente abundantes con un log Fold Change > 1 y significancia ajustada (FDR < 0.05). Los resultados, representados en gráficos como Volcano Plots, destacan fosfopéptidos clave que permiten interpretar las diferencias moleculares y las rutas de señalización activas en cada subtipo tumoral.
+
+**Nota aclarativa**: En el contexto de este análisis de fosfoproteómica, abundancia se refiere a la cantidad o nivel de fosforilación de los péptidos (proteínas) detectados en cada muestra. El estudio se centra en el análisis de fosfopéptidos (péptidos fosforilados).
+En términos prácticos, se trata de una medida cuantitativa obtenida de los datos de espectrometría de masas (LC-MS/MS), que nos da una idea de la cantidad relativa de un fosfopéptido en las diferentes muestras.
+
+---
+
+##### **1.2 ¿Qué rutas de señalización podrían estar más activas o reprimidas en los subtipos MSS y PD en función de los patrones de fosforilación?**
+  
+El análisis de enriquecimiento funcional reveló que PD activa vías como MAPK/ERK y PI3K/AKT, asociadas con proliferación, migración celular y remodelación del citoesqueleto, lo que sugiere un perfil más agresivo y resistente a terapias. Por otro lado, MSS mostró actividad en rutas relacionadas con metabolismo oxidativo y regulación apoptótica, reflejando un comportamiento más estable y menos agresivo.
+
+Estas conclusiones se obtuvieron mediante herramientas como `clusterProfiler` y bases de datos GO y KEGG, que mapearon los fosfopéptidos diferencialmente abundantes a procesos biológicos específicos, ofreciendo una interpretación funcional clara de las diferencias moleculares entre ambos subtipos tumorales.
+
+---
+
+##### **1.3 ¿Existen fosfopéptidos específicos que puedan actuar como biomarcadores para distinguir los subtipos tumorales MSS y PD?**
+
+El análisis estadístico identificó fosfopéptidos con diferencias significativas en su abundancia entre MSS y PD, cumpliendo criterios rigurosos como un log Fold Change > 1 y p-valores ajustados (FDR < 0.05). En PD, los fosfopéptidos relacionados con la vía MAPK fueron predominantes, mientras que en MSS se destacaron aquellos vinculados a procesos metabólicos y regulación del ciclo celular.
+
+Estos fosfopéptidos representan candidatos prometedores como biomarcadores específicos, con potencial para distinguir de manera precisa entre los subtipos tumorales y mejorar la estratificación de pacientes. Su utilidad radica en su relevancia biológica y en la posibilidad de aplicar esta información en la clasificación clínica y la detección temprana del cáncer colorrectal.
+
+---
+
+##### **1.4 ¿Qué implicaciones clínicas y terapéuticas podrían tener las diferencias en los niveles de fosforilación entre estos subtipos?**
+
+Las diferencias en los niveles de fosforilación entre MSS y PD tienen importantes implicaciones clínicas y terapéuticas. En PD, la activación de la vía MAPK/ERK sugiere que los inhibidores dirigidos a esta ruta, como los inhibidores de MEK, podrían ser terapias efectivas. En MSS, las estrategias podrían enfocarse en estabilizar rutas metabólicas o combinar tratamientos para maximizar su efectividad. 
+
+Además, los fosfopéptidos identificados como biomarcadores pueden mejorar la clasificación de los subtipos tumorales, facilitando la estratificación de pacientes y el diseño de terapias personalizadas basadas en las características moleculares de cada subtipo. Este enfoque permite optimizar el manejo clínico y mejorar el pronóstico de los pacientes con cáncer colorrectal, destacando la relevancia de los patrones de fosforilación en la medicina de precisión.
+
+---
+
+#### **2. Cuestiones Relacionadas con el Diseño Experimental**
+
+#### **¿Cómo se seleccionaron y aislaron las proteínas y fosfopéptidos específicos en este estudio?**
+
+En este estudio, se utilizaron modelos de xenoinjertos derivados de pacientes (PDX) con los subtipos tumorales MSS y PD como fuente de muestras biológicas. Las proteínas extraídas de estas muestras fueron digeridas con tripsina para fragmentarlas en péptidos. Posteriormente, se aplicaron métodos de enriquecimiento selectivo como TiO₂ y anticuerpos específicos para fosfotirosinas (α-pTyr) para aislar fosfopéptidos con grupos fosforilados, que constituyen el foco central del análisis. 
+
+La combinación de estas técnicas con la espectrometría de masas en tándem (LC-MS/MS) permitió identificar y cuantificar los fosfopéptidos relevantes con alta sensibilidad y especificidad.
+
+<img src="C:/Users/Jessica/OneDrive - Universitat Oberta de Catalunya/2ºCurso/ADO/PEC1/métodos.png" alt="Métodos" width="500">
+
+---
+
+##### **2.1 ¿Qué aspectos del diseño experimental podrían haber influido en la interpretación de los resultados?**
+
+En este estudio, se seleccionaron modelos de xenoinjertos derivados de pacientes (PDX) para MSS y PD, los cuales reflejan fielmente las características del tumor humano, pero presentan una variabilidad biológica intrínseca. Además, se emplearon métodos de enriquecimiento de fosfopéptidos (TiO₂ y α-pTyr), que aunque altamente específicos, pueden introducir sesgos al focalizar el análisis únicamente en rutas dependientes de fosforilación, dejando fuera otros procesos moleculares relevantes.
+
+Factores como el batch effect (efectos de lote) y la variabilidad técnica entre réplicas también pudieron influir en las diferencias observadas. Para mitigar estas limitaciones, se implementaron controles técnicos rigurosos y se utilizaron estrategias estadísticas avanzadas, como ajustes con el paquete `limma`, para garantizar que las diferencias detectadas fueran biológicamente significativas y no el resultado de artefactos técnicos.
+
+---
+
+##### **2.2 ¿Qué tipo de diseño experimental utilizaron los investigadores?**
+
+El diseño experimental fue un análisis comparativo entre los subtipos tumorales MSS y PD, utilizando xenoinjertos derivados de pacientes (PDX) como modelo experimental. Este diseño incluyó réplicas biológicas para capturar la variabilidad intrínseca de los tumores y réplicas técnicas para controlar la variabilidad introducida durante el procesamiento de muestras. Cada grupo fue representado por tres muestras, procesadas en dos réplicas técnicas, generando un total de doce mediciones.
+
+Los datos obtenidos fueron preprocesados mediante normalización logarítmica y ajustes estadísticos para mitigar efectos técnicos, como el batch effect.
+
+---
+
+##### **2.3 ¿Por qué se eligieron específicamente los modelos de xenoinjertos derivados de pacientes (PDX) como el modelo experimental para MSS y PD?**
+
+Los modelos de xenoinjertos derivados de pacientes (PDX) fueron elegidos porque reproducen con alta fidelidad las características genéticas, fenotípicas y del microambiente tumoral humano, incluidas las modificaciones postraduccionales como la fosforilación. Estos modelos permiten conservar la heterogeneidad y propiedades moleculares del tumor original, proporcionando una base experimental más relevante para estudiar las diferencias biológicas entre MSS y PD en comparación con modelos in vitro o animales.
+
+Además, replican de manera más precisa las interacciones tumorales en un entorno fisiológicamente relevante, lo que los convierte en una herramienta valiosa para analizar las diferencias moleculares específicas de cada subtipo tumoral. No obstante, su uso también introduce cierta variabilidad biológica intrínseca, que debe ser considerada al interpretar los resultados del análisis.
+
+
+---
+
+##### **2.4 ¿Cuáles son las ventajas y limitaciones de la selección y el enriquecimiento de fosfopéptidos utilizando métodos como TiO2 y α-pTyr?**
+
+El enriquecimiento de fosfopéptidos mediante métodos como TiO₂ y α-pTyr ofrece importantes ventajas al permitir la detección específica de fosfopéptidos fosforilados en serinas, treoninas y tirosinas, respectivamente. Esto mejora significativamente la sensibilidad y especificidad en la identificación de modificaciones de fosforilación clave, facilitando el análisis de rutas de señalización relevantes y la identificación de posibles biomarcadores.
+
+Sin embargo, estos métodos también tienen limitaciones. Su alta selectividad puede excluir fosfopéptidos menos abundantes o con sitios de fosforilación menos representados, introduciendo un sesgo hacia aquellos con mayor afinidad al método de enriquecimiento. Esto podría restringir el análisis a rutas dependientes de fosforilación, dejando fuera otras modificaciones postraduccionales relevantes en el contexto del cáncer.
+
+---
+
+##### **2.5 ¿Cómo se controló la variabilidad experimental?**
+
+La variabilidad experimental se controló mediante el uso de réplicas técnicas y biológicas. Cada muestra fue procesada en dos réplicas técnicas para evaluar y ajustar las diferencias introducidas por la instrumentación y el procesamiento. Además, se incluyeron réplicas biológicas para capturar la heterogeneidad intrínseca de los subtipos MSS y PD, asegurando que los resultados representen de manera confiable las características moleculares de cada grupo.
+
+En el análisis estadístico, se aplicaron ajustes como duplicateCorrelation del paquete limma, normalización logarítmica y normalización cuantílica (quantile normalization). Este último método garantiza que las distribuciones de abundancia de los fosfopéptidos sean comparables entre muestras, minimizando sesgos técnicos y asegurando que las diferencias observadas reflejen variaciones biológicas reales. Estas estrategias conjuntas permitieron obtener resultados más robustos y reproducibles. 
+
+Además de las estrategias ya mencionadas, se realizaron mapas de calor de valores perdidos y gráficos de boxplot antes y después de la normalización para evaluar la calidad inicial de los datos y confirmar que la normalización era efectiva en reducir la variabilidad técnica. 
+
+
+---
+
+##### **2.6 ¿Se han considerado efectos de batch o factores técnicos adicionales que puedan influir en las diferencias observadas entre MSS y PD?**
+
+Sí, se consideraron efectos de lote (batch effects) y factores técnicos adicionales que pudieran influir en las diferencias observadas entre MSS y PD. Para mitigar estos efectos, se implementaron controles estadísticos como `arrayWeights` y `duplicateCorrelation` del paquete `limma`, que permiten ajustar las variaciones técnicas y las réplicas, minimizando el impacto de artefactos experimentales en los datos.
+
+Además, se aplicaron transformaciones logarítmicas y normalización cuantílica para garantizar una distribución comparable de las abundancias entre muestras y reducir el ruido técnico. 
+
+Asimismo, se realizaron análisis exploratorios previos como PCA para detectar posibles artefactos relacionados con efectos de batch. Estos análisis permitieron evaluar si había sesgos significativos introducidos por factores técnicos, antes de aplicar las correcciones estadísticas mencionadas. Este paso preliminar asegura que las estrategias de normalización y ajuste se aplicaran de manera adecuada al contexto experimental.
+
+Estas estrategias aseguran que las diferencias observadas entre MSS y PD sean biológicamente significativas y no un producto de efectos técnicos o de lote.
+
+---
+
+#### **3. Cuestiones Relacionadas con la Obtención de Datos Crudos y Métodos de Análisis**
+
+##### **3.1 ¿Cómo afecta la técnica de espectrometría de masas en tándem (LC-MS/MS) a la precisión y sensibilidad en la detección de fosfopéptidos en los subtipos tumorales?**
+
+La espectrometría de masas en tándem (LC-MS/MS), combinada con fragmentación por colisión (CID o HCD), fue clave para la detección y cuantificación precisa de fosfopéptidos en este estudio. Estas configuraciones permitieron identificar modificaciones de fosforilación en proteínas con alta sensibilidad, logrando una resolución suficiente para distinguir diferencias significativas entre MSS y PD. Además, el uso de métodos de enriquecimiento selectivo como TiO₂ y α-pTyr mejoró la cobertura de fosfopéptidos fosforilados, facilitando el análisis de rutas de señalización clave.
+
+No obstante, LC-MS/MS tiene limitaciones inherentes, como el sesgo hacia péptidos más abundantes y aquellos con mayor afinidad al método de enriquecimiento. Esto puede llevar a una representación incompleta de los fosfopéptidos presentes en las muestras. Estas limitaciones se mitigaron mediante controles técnicos, como la calibración de los espectrómetros para minimizar el ruido, y mediante ajustes estadísticos que garantizaron que las diferencias detectadas fueran representativas y confiables.
+
+---
+
+##### **3.2 ¿Qué tipo de preprocesamiento o normalización se aplicó a los datos para obtener una abundancia normalizada fiable?**
+
+El preprocesamiento de los datos incluyó múltiples pasos para garantizar su calidad y comparabilidad. Inicialmente, se realizaron mapas de calor para detectar valores faltantes y gráficos de boxplots para evaluar la consistencia en las distribuciones entre muestras. Los datos se transformaron logarítmicamente (log10) para estabilizar la varianza, reducir el impacto de valores extremos y mejorar la comparabilidad.
+
+Posteriormente, se aplicó normalización cuantílica (quantile normalization), asegurando que las distribuciones de abundancia fueran homogéneas entre muestras y reduciendo posibles sesgos técnicos. Como parte del análisis estadístico, se utilizó la función duplicateCorrelation del paquete limma para ajustar las réplicas técnicas y corregir efectos técnicos adicionales. Antes de proceder con el análisis diferencial, se realizaron análisis exploratorios, como PCA, para confirmar que el preprocesamiento y la normalización eran efectivos, lo que garantizó que las diferencias detectadas reflejaran variaciones biológicas reales.
+
+
+--- 
+
+##### **3.3 ¿Cómo se seleccionaron los fosfopéptidos para el análisis estadístico, se aplicaron criterios específicos para la inclusión o exclusión de datos?**
+
+Los fosfopéptidos seleccionados para el análisis estadístico fueron filtrados siguiendo criterios rigurosos de calidad y significancia. Inicialmente, se excluyeron aquellos con un alto porcentaje de valores faltantes, inconsistencias entre réplicas técnicas o variabilidad excesiva, garantizando la fiabilidad de los datos incluidos. Los fosfopéptidos restantes fueron evaluados mediante análisis estadísticos con el paquete limma, aplicando umbrales estrictos como un p-valor ajustado (FDR < 0.05) y un cambio en la abundancia significativo (log Fold Change > 1 o < -1).
+
+Adicionalmente, se consideraron gráficos de Volcano Plots y resúmenes descriptivos como herramientas de validación para confirmar la relevancia de los fosfopéptidos seleccionados. Aunque no se aplicaron filtros adaptativos para excluir valores de baja intensidad, la transformación logarítmica fue suficiente para estabilizar la variabilidad extrema sin eliminar fosfopéptidos potencialmente relevantes. Este enfoque permitió identificar un conjunto clave de fosfopéptidos diferencialmente abundantes entre MSS y PD, esenciales para los análisis funcionales y la identificación de biomarcadores.
+
+
+---
+
+A continuación, implementamos el código organizado y comentado para responder a cada pregunta.
+
+##### **Importación de datos y carga de paquetes**
+
+La carga y configuración de los paquetes es un paso esencial para asegurar que todas las herramientas necesarias están disponibles y listas para su uso. Estos paquetes ofrecen funcionalidades específicas para la manipulación, análisis y visualización de datos ómicos.
+
+
+```{r message = FALSE, warning = FALSE, echo=FALSE}
+
+# Definimos una función para instalar y cargar paquetes si no están ya instalados
+install_if_missing <- function(package) {
+  if (!requireNamespace(package, quietly = TRUE)) { # Verificamos si el paquete está instalado
+    install.packages(package)                      # Instalamos el paquete si falta
+  }
+  library(package, character.only = TRUE)           # Cargamos el paquete en el entorno de trabajo
+}
+
+# Instalamos paquetes básicos para manipulación y visualización de datos
+install_if_missing("tidyverse")    # Manipulación de datos y gráficos
+install_if_missing("readxl")       # Lectura de archivos Excel
+install_if_missing("ggplot2")      # Visualización de datos con gráficos personalizados
+install_if_missing("curl")         # Descarga de archivos desde URL
+
+#install.packages("webshot")       # Instala webshot para capturas de pantalla en páginas web o gráficos HTML y guardarlas como imágenes
+#webshot::install_phantomjs()      # Herramienta necesaria para que webshot funcione
+
+# Instalamos paquetes de Bioconductor necesarios para análisis bioinformático
+if (!requireNamespace("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")  # Instalamos BiocManager si no está presente
+BiocManager::install("clusterProfiler")     # Análisis de enriquecimiento funcional
+BiocManager::install("org.Hs.eg.db")        # Base de datos de genes humanos
+BiocManager::install("limma")               # Análisis diferencial de expresión
+BiocManager::install("SummarizedExperiment")# Estructura de datos ómicos
+BiocManager::install("EnhancedVolcano")     # Visualización de resultados de expresión diferencial
+BiocManager::install("ReactomePA")          # Análisis de rutas en Reactome
+BiocManager::install("RDAVIDWebService")    # Compatibilidad con DAVID para análisis de enriquecimiento
+BiocManager::install("preprocessCore")      # Técnicas de normalización
+BiocManager::install("UniProt.ws")          # Base de datos para la anotación funcional de fosfopéptidos
+BiocManager::install("biomaRt")             # Base de datos para la anotación funcional
+BiocManager::install("DOSE")                # Análisis de sobrerrepresentación de términos en estudios de enriquecimiento funcional
+BiocManager::install("enrichplot")          # Librería para visualizar resultados de enriquecimiento
+BiocManager::install("STRINGdb")            # Interfaz para acceder a la base de datos STRING
+
+# Cargamos todos los paquetes para manipulación, visualización y análisis
+library(tidyverse)          # Manipulación y visualización de datos
+library(readxl)              # Lectura de archivos de Excel
+library(curl)                # Descarga de archivos desde URL
+library(SummarizedExperiment) # Creación de objetos SummarizedExperiment para análisis ómicos
+library(clusterProfiler)     # Análisis de enriquecimiento funcional en rutas
+library(org.Hs.eg.db)        # Base de datos de anotación para genes humanos
+library(limma)               # Análisis diferencial de expresión con modelos lineales
+library(statmod)             # Modelos estadísticos adicionales
+library(ggplot2)             # Gráficos personalizados
+library(EnhancedVolcano)     # Visualización de datos de expresión diferencial.
+library(webshot)             # Captura de pantalla en páginas web (análisis de enriquecimiento)
+library(preprocessCore)      # Técnicas de normalización en datos de expresión génica
+library(UniProt.ws)
+library(biomaRt)
+library(DOSE)
+library(enrichplot)
+library(ReactomePA)
+library(STRINGdb)
+
+```
+
+
+---
+
+##### **Importación y Preprocesado de los Datos**
+
+Este bloque se enfoca en la preparación de datos para el análisis, un paso previo a cualquier selección de fosfopéptidos.
+
+En esta sección se importan los datos de fosfopéptidos y se estructura la matriz de abundancias como paso preliminar al análisis diferencial entre los grupos MSS y PD. Este bloque establece la base para abordar las cuestiones relacionadas con la normalización y selección de fosfopéptidos, que serán detalladas en secciones posteriores.
+
+Este paso es crucial para establecer las bases del análisis estadístico, ya que asegura que los datos están correctamente formateados. Aunque aquí no se aplican técnicas específicas de normalización o selección de datos, estos procesos se desarrollarán en las secciones dedicadas al preprocesamiento y análisis estadístico.
+
+Cargamos los datos desde el repositorio de GitHub y realizamos una comprobación visual y estructural para entender su composición.
+
+
+```{r message = FALSE, warning = FALSE, echo=FALSE}
+
+# Descargamos los datos directamente desde GitHub para garantizar su disponibilidad 
+# La descarga desde una URL permite el acceso reproducible a los datos
+# Esto garantiza que el análisis se pueda replicar con los mismos datos independientemente del entorno
+url <- "https://github.com/nutrimetabolomics/metaboData/raw/main/Datasets/2018-Phosphoproteomics/TIO2+PTYR-human-MSS+MSIvsPD.XLSX"
+temp_file <- tempfile(fileext = ".xlsx")          # Creamos un archivo temporal para almacenar los datos
+curl_download(url, temp_file)                     # Descargamos el archivo desde la URL al archivo temporal
+ 
+
+# Leemos los datos de fosfopéptidos y los metadatos desde el archivo Excel descargado
+# `read_excel` permite leer archivos de Excel en R. Es ideal para datos tabulares que vienen en diferentes hojas
+# Usamos `sheet = 1` y `sheet = 2` para seleccionar las hojas específicas del archivo
+# phData contiene los datos de fosfopéptidos y targets contiene los metadatos
+# Separar phData y targets permite tener una estructura clara y facilita el uso de targets para el diseño experimental en el análisis estadístico
+phData <- read_excel(temp_file, sheet = 1)
+phData <- read_excel(temp_file, sheet = 1) # Cargamos la hoja 1 que contiene las abundancias de fosfopéptidos
+targets <- read_excel(temp_file, sheet = 2) # Cargamos la hoja 2 que contiene metadatos de las muestras
+
+
+# Realizamos una comprobación inicial de los datos para verificar su estructura
+# `head` permite visualizar las primeras filas del DataFrame
+head(phData)
+head(targets)
+
+
+```
+
+---
+
+##### **Preparación de los Metadatos y Datos Principales**
+
+En este apartado se prepara la matriz de abundancias y los metadatos de las muestras como paso previo al análisis estadístico. Aunque no se seleccionan ni filtran fosfopéptidos, este bloque organiza la información de manera que sea posible abordar cuestiones relacionadas con la variabilidad experimental, el diseño experimental y la selección de biomarcadores en análisis posteriores.
+
+Los datos principales corresponden a las abundancias normalizadas de señales MS y los metadatos incluyen las etiquetas de muestra y grupo.
+
+```{r message = FALSE, warning = FALSE, echo=FALSE}
+
+# Importamos y seleccionamos las columnas de abundancia de fosfopéptidos
+# Creamos una matriz de abundancias seleccionando solo las columnas relevantes
+# `select(matches("^(M|T)"))` selecciona las columnas que comienzan con "M" o "T", que son las muestras en nuestro caso 
+# Otra opción podría ser `abundances <- phData %>% select(5:16)` que selecciona las columnas donde se encuentran las muestras
+# `as.matrix` convierte el DataFrame en una matriz, ya que algunas funciones de análisis requieren una estructura de matriz
+abundances <- phData %>% dplyr::select(matches("^(M|T)")) %>% as.matrix()
+
+# Asignamos nombres de filas únicos a `abundances` usando la columna `Accession`
+# Utilizamos la columna `Accession` para identificar cada proteína en la matriz de abundancia
+# `make.names` asegura que cada nombre sea único, añadiendo sufijos en caso de duplicados
+rownames(abundances) <- make.names(phData$Accession, unique = TRUE)
+
+# Preparamos `row_data` con información descriptiva de cada fosfopéptido
+# Creamos un DataFrame `row_data` que almacena detalles adicionales sobre cada fosfopéptido (como descripción y puntuación)
+# Esto es útil para análisis posteriores de enriquecimiento en bases de datos de fosforilación
+row_data <- phData %>%
+  dplyr::select(Accession, SequenceModifications, Description, Score) %>%  # Seleccionamos columnas informativas
+  dplyr::mutate(Accession = make.names(Accession, unique = TRUE))          # Garantizamos unicidad en la columna `Accession`
+rownames(row_data) <- row_data$Accession                                   # Asignamos `Accession` como nombres de fila para `row_data`
+
+# Preparamos los metadatos para cada muestra a partir de la hoja `targets`
+# `metadata` almacenará información experimental (grupo y réplica) sobre cada muestra
+# Renombramos las columnas de `targets` para que coincidan con los términos usados en el análisis (`sample`, `individual`, `group`)
+metadata <- targets %>%
+  dplyr::rename(
+    sample = `Sample...1`,        # Renombramos la columna `Sample...1` a `sample` para claridad y consistencia
+    individual = `Individual`,    # Renombramos `Individual` (no cambia, pero mejora la legibilidad del código)
+    group = `Phenotype`           # Renombramos `Phenotype` a `group` para especificar el tipo de tumor MSS o PD
+  ) %>%
+  dplyr::mutate(
+    group = factor(group, levels = c("MSS", "PD")),           # Convertimos `group` en un factor, importante para el análisis en `limma`
+    replicate = factor(ifelse(grepl("_1$", sample), 1, 2))    # Creamos la columna `replicate` basándonos en el sufijo "_1" o "_2" en `sample`
+  )
+
+# Asignamos los nombres de las muestras como nombres de fila en `metadata`
+# Esto facilita el acceso y emparejamiento de los datos de abundancia con sus metadatos correspondientes
+rownames(metadata) <- metadata$sample
+
+# Verificamos y ajustamos los nombres de columna de `abundances` para que coincidan con los nombres de muestra en `metadata`
+# Esto asegura que `SummarizedExperiment` asocie correctamente la matriz de abundancias con los metadatos
+colnames(abundances) <- metadata$sample
+
+```
+
+---
+
+##### **Creación del Objeto SummarizedExperiment**
+
+`SummarizedExperiment` es una estructura de datos ideal para estudios ómicos, integrando la matriz de abundancias con los metadatos de cada muestra. Este formato facilita la manipulación y el análisis de datos, ya que permite aplicar métodos estadísticos directamente sobre el objeto estructurado.
+
+```{r message = FALSE, warning = FALSE, echo=FALSE}
+
+# Creamos el objeto `SummarizedExperiment` para almacenar y estructurar los datos de manera integrada
+# `SummarizedExperiment` facilita el análisis en paquetes de Bioconductor, ya que combina `abundances`, `row_data` y `metadata`
+# `assays` almacena los datos de abundancia como una lista llamada `counts`
+# `rowData` y `colData` añaden información descriptiva de las filas y columnas, respectivamente
+se <- SummarizedExperiment(
+  assays = list(counts = abundances),  # Añadimos `abundances` como `counts` en la lista de datos principales
+  rowData = row_data,                  # Añadimos `row_data` con información descriptiva de fosfopéptidos
+  colData = metadata                   # Añadimos `metadata` con información experimental de las muestras
+)
+
+# Verificamos el objeto `SummarizedExperiment` creado
+# Este paso imprime una vista general del objeto `se`, confirmando que los datos están organizados adecuadamente
+se
+
+```
+
+**Interpretación de los resultados**
+
+La creación del objeto `SummarizedExperiment` parece haber funcionado correctamente. Este paso asegura que nuestros datos están listos para los análisis estadísticos y visualización en los próximos apartados.
+
+Aquí tienes una interpretación siguiendo el estilo que prefieres:
+
+1. **Dimensiones (`dim`)**: Indica `1438 x 12`, lo que significa que tenemos 1438 filas (representando fosfopéptidos) y 12 columnas (correspondientes a las muestras), capturando así la cantidad total de datos que esperábamos para el análisis.
+
+2. **Assays (`assays`)**: Contiene `counts`, confirmando que la matriz de abundancias de los fosfopéptidos se ha almacenado correctamente como el dato principal en el objeto `SummarizedExperiment`.
+
+3. **Nombres de Filas (`rownames`)**: Los nombres de las 1438 filas corresponden a identificadores únicos de cada fosfopéptido, lo que asegura una referencia clara y sin duplicados para cada entrada.
+
+4. **Datos de las Filas (`rowData`)**: Incluye 4 atributos (`Accession`, `SequenceModifications`, `Description`, `Score`) que proporcionan información descriptiva adicional para cada fosfopéptido, útil para análisis detallados y referencias cruzadas en bases de datos.
+
+5. **Nombres de Columnas (`colnames`)**: Contiene los nombres de las muestras (`M1_1`, ..., `M64_2`), asegurando que cada columna en la matriz de abundancia esté correctamente asociada a su muestra correspondiente.
+
+6. **Metadatos de las Columnas (`colData`)**: Contiene 5 atributos (`sample`, `Sample...2`, `individual`, `group`, `replicate`) que describen las características experimentales de cada muestra, como su grupo (`MSS` o `PD`), individuo al que pertenece y número de réplica, lo cual es fundamental para los análisis estadísticos y de variabilidad.
+
+Este código es óptimo para preparar datos de fosfoproteómica para análisis estadísticos y de enriquecimiento porque estructura de manera integrada las abundancias, los metadatos y la información descriptiva de los fosfopéptidos en un objeto `SummarizedExperiment`. Esto facilita el uso de herramientas de Bioconductor, como `limma` para análisis diferencial y bases de datos como KEGG o PhosphoSitePlus para análisis de enriquecimiento, asegurando una gestión de datos eficiente y una compatibilidad total con los flujos de trabajo bioinformáticos avanzados.
+
+---
+
+#### **4. Cuestiones sobre el Control de Calidad y Preprocesado de Datos**
+
+Este apartado tiene como objetivo asegurar la calidad e integridad de los datos antes del análisis estadístico. Aquí abordamos varias cuestiones clave:
+
+##### **4.1 ¿Cuáles pueden ser los posibles desafíos relacionados con la calidad de los datos crudos?**
+
+Los datos crudos obtenidos mediante LC-MS/MS presentan desafíos clave:
+
+- **Valores faltantes:** Comunes debido a límites de detección en el espectrómetro o variaciones en el enriquecimiento de fosfopéptidos.
+
+- **Ruido técnico y valores extremos:** Introducidos por discrepancias en el procesamiento experimental y la sensibilidad de los instrumentos.
+
+- **Distribuciones asimétricas:** Con abundancias sesgadas hacia niveles bajos de detección, complicando la comparación entre muestras.
+
+- **Batch effects:** Efectos de lote que pueden introducir variaciones no biológicas entre corridas experimentales.
+
+**Cómo se abordó en el código:**
+
+- Se generaron **mapas de calor** para detectar patrones de valores faltantes y evaluar su impacto.
+
+- Boxplots e histogramas identificaron valores extremos y distribuciones asimétricas, justificando la necesidad de transformaciones logarítmicas y normalización.
+
+- Se emplearon **análisis PCA** preliminares para detectar posibles efectos técnicos o de lote antes de continuar con los análisis diferenciales.
+
+##### **4.2 ¿Qué ajustes o preprocesados serían razonables para abordar estos desafíos?**
+
+  Se implementaron ajustes y preprocesados específicos para garantizar la calidad de los datos:
+
+1. **Transformación logarítmica (log10):** Estabilizó la varianza y redujo el impacto de valores extremos.
+
+2. **Normalización cuantílica (quantile normalization):** Igualó las distribuciones de abundancia entre muestras, minimizando sesgos técnicos.
+
+3. **Exclusión de fosfopéptidos con valores faltantes críticos:** Aseguró que los datos retenidos fueran confiables y representativos.
+
+4. **Evaluaciones exploratorias (PCA):** Confirmaron que las muestras normalizadas eran biológicamente coherentes y libres de artefactos técnicos.
+
+**Cómo se implementó en el código:**
+
+- Se utilizaron funciones como `log10` para transformar los datos y `normalize.quantiles` para realizar la normalización cuantílica.
+
+- Los boxplots se utilizaron para validar la efectividad de los ajustes.
+
+- Se realizó PCA con `prcomp` para verificar que las diferencias observadas fueran biológicas y no resultado de artefactos técnicos.
+
+##### **4.3 ¿Cómo se controló la variabilidad experimental con las réplicas técnicas?**
+
+El control de la variabilidad experimental incluyó:
+
+- **Réplicas técnicas:** Cada muestra fue procesada en dos réplicas técnicas para evaluar y corregir inconsistencias instrumentales.
+
+- **Ajustes estadísticos:** Se utilizó la función `duplicateCorrelation` del paquete `limma` para modelar la correlación entre réplicas técnicas y ajustar su impacto en los modelos lineales.
+
+- **Evaluaciones visuales:** Boxplots y análisis PCA antes y después de la normalización garantizaron que las réplicas técnicas fueran consistentes y los datos fiables.
+
+**Cómo se implementó en el código:**
+
+- `duplicateCorrelation` se utilizó en el diseño estadístico para ajustar las diferencias entre réplicas técnicas.
+
+- Boxplots confirmaron la consistencia entre réplicas antes y después de la normalización.
+
+- PCA validó que las réplicas técnicas no introducían sesgos significativos en los datos finales.
+
+
+---
+
+##### **Resumen estadístico de los datos de abundancia**
+
+Comenzamos con un resumen estadístico de las abundancias para entender el rango de valores y la estructura general de los datos.
+
+```{r message = FALSE, warning = FALSE, echo=FALSE}
+
+# Generamos un resumen estadístico de los datos de abundancia
+# `summary` proporciona estadísticas descriptivas como mínimo, primer cuartil, mediana, media, tercer cuartil y máximo
+# Esto permite verificar la presencia de valores extremos y detectar si existe una distribución sesgada
+summary(assay(se, "counts"))      # Resumen estadístico de la matriz de abundancias en el objeto SummarizedExperiment
+
+# Obtenemos las dimensiones de la matriz de abundancias para verificar el tamaño de los datos
+# `dim` devuelve el número de filas y columnas en la matriz, que en este caso corresponde a 1438 fosfopeptidos y 12 muestras
+dim(assay(se, "counts"))          # Imprimimos las dimensiones de la matriz de abundancias
+
+```
+
+Este bloque proporciona una visión general de la distribución de las abundancias y permite identificar rangos amplios, valores fuera de lo esperado y sesgos que podrían influir en el análisis posterior. 
+
+**Interpretación de los resultados**
+
+El resumen estadístico mostró una gran variabilidad en las abundancias de fosfopéptidos entre las muestras, con algunos valores extremadamente altos en ciertas muestras (por ejemplo, algunas del grupo PD). Esta variabilidad puede estar relacionada con diferencias en los niveles de fosforilación entre los subtipos tumorales MSS y PD. Dado que el objetivo es identificar diferencias en la fosforilación que permitan la caracterización entre subtipos, esta observación inicial indica que podrían existir fosfopéptidos específicos que diferencian estos grupos, justificando la realización de un análisis más profundo.
+
+**Interpretación Detallada**
+
+El resumen estadístico de la matriz de abundancias muestra:
+
+1. **Valores mínimos y máximos**: Todas las muestras tienen valores mínimos de 0, lo cual indica presencia de datos faltantes o no detectados en algunas mediciones. Los valores máximos son bastante elevados y variables entre muestras, con un rango que va desde alrededor de 15 millones hasta 889 millones, lo cual sugiere la existencia de fosfopéptidos con abundancias extremadamente altas en algunas muestras.
+
+2. **Mediana y media**: Las medianas y medias también varían significativamente entre muestras. En todas ellas, las medias son mayores que las medianas, indicando una distribución sesgada hacia la izquierda, donde la mayoría de los valores son bajos y unos pocos valores son extremadamente altos.
+
+3. **Cuartiles**: La dispersión de los datos dentro de cada muestra, reflejada en el rango intercuartílico (diferencia entre el primer y tercer cuartil), también muestra alta variabilidad. Esto refuerza la idea de que los datos están distribuidos de forma asimétrica.
+
+En general, las estadísticas descriptivas sugieren una alta variabilidad entre muestras y sugieren que los datos están sesgados hacia valores bajos, lo cual es común en proteómica y puede requerir normalización o transformación para un análisis posterior más profundo.
+
+---
+
+##### **Comprobación de valores nulos en los datos de fosfopéptidos**
+
+```{r message = FALSE, warning = FALSE, echo=FALSE}
+
+# Comprobamos si hay valores nulos en cada columna de la matriz de conteo en el objeto SummarizedExperiment
+# `is.na` devuelve TRUE para cada valor nulo y `colSums` cuenta el número total de valores nulos por columna
+null_values <- colSums(is.na(assay(se, "counts")))  # Contamos valores nulos en cada columna del assay 'counts'
+null_values  # Mostramos el número de valores nulos en cada columna
+
+
+```
+
+Este paso verifica la presencia de valores nulos en el conjunto de datos. La ausencia de valores nulos indica que no es necesario realizar imputaciones.
+
+---
+
+##### **Visualización de valores nulos con un mapa de calor**
+
+La visualización de valores nulos con un mapa de calor permite identificar rápidamente patrones de ausencia en grandes conjuntos de datos. Esto contribuye a la evaluación de la calidad de los datos crudos ayudando a decidir si hay problemas de integridad en los datos que deben solucionarse antes del análisis.
+
+```{r message = FALSE, warning = FALSE, echo=FALSE}
+
+# Visualizamos los valores nulos utilizando un mapa de calor
+# `Amelia` es un paquete que permite visualizar valores ausentes en un mapa de calor, facilitando su detección en grandes conjuntos de datos.
+# Si el paquete `Amelia` no está instalado, lo instalamos, y luego lo cargamos
+if (!requireNamespace("Amelia", quietly = TRUE)) install.packages("Amelia")  # Instalación condicional de Amelia
+library(Amelia)                                                              # Cargamos el paquete Amelia para la visualización de valores nulos
+
+# Convertimos la matriz de conteo a un data.frame para que sea compatible con missmap
+counts_df <- as.data.frame(assay(se, "counts"))
+
+# Generamos un mapa de calor de valores nulos usando `missmap` de Amelia
+# `missmap` muestra gráficamente la ubicación de los valores nulos, facilitando la detección de patrones de ausencia
+Amelia::missmap(counts_df, main = "Mapa de Valores Nulos")  # Visualización de valores nulos con título "Mapa de Valores Nulos"
+
+```
+
+**Interpretación de los resultados**
+
+La ausencia de valores nulos en las columnas de abundancia indica una buena calidad inicial de los datos (en este contexto), lo que significa que no es necesario realizar imputaciones de valores. Este control inicial es esencial para asegurar que los análisis estadísticos sean robustos y no se vean sesgados.
+
+---
+
+##### **Conversión de la matriz de abundancias a formato de DataFrame para visualización**
+
+Esta transformación facilita el uso de `ggplot2` para la visualización de cada muestra individualmente.
+
+```{r message = FALSE, warning = FALSE, echo=FALSE}
+
+# Convertimos el assay 'counts' del objeto SummarizedExperimente en un DataFrame para facilitar su uso con `ggplot2`
+# `as.data.frame` transforma la matriz en un DataFrame, necesario para ciertas visualizaciones y manipulaciones en `ggplot2`
+abundances_df <- as.data.frame(assay(se, "counts"))     # Convertimos la matriz de abundancias en un DataFrame llamado abundances_df
+
+# Transformamos el DataFrame a un formato largo para `ggplot2`
+# `pivot_longer` reorganiza el DataFrame en formato largo, con columnas 'sample' y 'abundance' para cada observación
+# Esto es esencial para generar gráficos donde cada muestra puede ser visualizada individualmente
+abundances_df_long <- abundances_df %>%
+  pivot_longer(cols = everything(), names_to = "sample", values_to = "abundance")  # Transformamos el formato con 'sample' y 'abundance'
+
+
+```
+
+
+---
+
+##### **Generación de histogramas para visualizar la distribución de abundancias de fosfopéptidos en cada muestra**
+
+Los histogramas permiten visualizar la distribución de abundancias por muestra y detectar sesgos o valores extremos. 
+
+Este análisis aborda la calidad de los datos crudos y prepara el terreno para el análisis diferencial, ayudando a entender la variabilidad intrínseca de las muestras.
+
+```{r message = FALSE, warning = FALSE, echo=FALSE}
+
+# Generamos histogramas de abundancia para cada muestra
+# `ggplot` inicializa el gráfico, y `geom_histogram` crea un histograma de abundancias por muestra
+# `facet_wrap` organiza los gráficos por muestra en paneles separados, permitiendo observar la distribución de abundancias por muestra
+ggplot(abundances_df_long, aes(x = abundance)) +
+  geom_histogram(bins = 30, fill = "#FF1493", color = "black") +      # Configuramos 30 barras, color de relleno y bordes
+  facet_wrap(~ sample, scales = "free", ncol = 3) +                   # Separación de gráficos por muestra, con 3 columnas en la visualización
+  theme_minimal() +                                                   # Estilo minimalista para facilitar la lectura
+  labs(title = "Distribución de Abundancias de Fosfopéptidos por Muestra",
+       x = "Abundancia",
+       y = "Frecuencia") +                                            # Añadimos título y etiquetas para los ejes
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 12),
+    strip.text = element_text(size = 10) # Ajustamos el tamaño de las etiquetas de muestra
+  )
+
+
+```
+
+
+**Interpretación de los resultados**
+
+Los histogramas muestran la distribución de las abundancias de fosfopéptidos en cada muestra. En general, observamos que las distribuciones son asimétricas, con la mayoría de los datos concentrados en el extremo inferior cercanos a cero.  Esta distribución altamente sesgada es consistente en todas las muestras.
+
+Se observa una alta concentración de fosfopéptidos con abundancias bajas y solo unos pocos con abundancias muy altas, reflejando una distribución fuertemente sesgada hacia la izquierda. Esta asimetría es común en datos de proteómica. La concentración de abundancias bajas sugiere la necesidad de una transformación logarítmica para normalizar los datos estabilizando la varianza, mejorar la visibilidad de los patrones y facilitar comparaciones entre muestras.
+
+Asimismo, la presencia de fosfopéptidos con alta abundancia en ciertas muestras puede reflejar la activación de rutas específicas en estos tumores, lo cual es relevante para entender la señalización diferencial en los subtipos MSS y PD.
+
+
+---
+
+##### **Visualización de variabilidad con boxplots para cada muestra**
+
+Los boxplots muestran la variabilidad de las abundancias entre muestras, resaltando outliers y diferencias en la dispersión. Esto responde a la cuestión sobre la variabilidad de las muestras y los posibles valores atípicos, ayudando a decidir si es necesario algún ajuste adicional.
+
+```{r message = FALSE, warning = FALSE, echo=FALSE}
+
+# Generamos boxplots de abundancia para observar la variabilidad y detectar outliers
+# `geom_boxplot` crea gráficos de caja que resumen la distribución por muestra, destacando la mediana, los cuartiles y valores atípicos
+ggplot(abundances_df_long, aes(x = sample, y = abundance)) +
+  geom_boxplot(fill = "#FF1493") +                                     # Establecemos el color de relleno
+  labs(title = "Boxplots de Abundancias por Muestra", 
+       x = "Muestras", 
+       y = "Abundancia") +                                             # Añadimos título y etiquetas para los ejes
+  theme_minimal() +                                                    # Aplicamos tema minimalista para mejorar la claridad
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),  # Centrado y formato del título
+    axis.text.x = element_text(angle = 90, hjust = 1, size = 10),      # Rotamos etiquetas del eje x para mejor visibilidad
+    axis.title = element_text(size = 12)                               # Ajuste del tamaño de las etiquetas de ejes
+  )
+```
+
+**Interpretación de los resultados**
+
+Los boxplots destacan aún más el sesgo en los datos, con la mayoría de las muestras mostrando una distribución de valores comprimidos en la parte baja y múltiples outliers en el extremo superior.
+
+Los outliers representan fosfopéptidos con abundancias mucho mayores que el resto, lo cual podría estar relacionado con proteínas especialmente activas o rutas diferenciadas en las muestras.
+
+La variabilidad entre las muestras es notable, pero la mayoría de los valores se concentran cerca de cero, lo cual puede justificar una transformación logarítmica para reducir el impacto de estos valores extremos y visualizar mejor las diferencias entre muestras. 
+
+Este análisis inicial sugiere que los datos de abundancia necesitan un ajuste (como una transformación logarítmica) para mejorar la normalización y facilitar la interpretación en análisis posteriores.
+
+---
+
+##### **Transformación logarítmica para normalizar los datos y reducir la influencia de valores extremos**
+
+Para reducir la influencia de valores extremos, aplicamos una transformación logarítmica a los datos de abundancia y generamos un nuevo gráfico de boxplot. Esto puede ayudar a visualizar y comparar mejor las diferencias entre las muestras. La transformación logarítmica suaviza las distribuciones y estabiliza la varianza, reduciendo el sesgo de los valores extremos y permitiendo una visualización más equitativa de las muestras. Este paso es crucial para abordar la cuestión de normalización de los datos.
+
+
+```{r message = FALSE, warning = FALSE, echo=FALSE}
+
+# Aplicamos una transformación logarítmica para reducir el impacto de valores extremos
+# `log10(abundance + 1)` calcula el logaritmo base 10 de la abundancia, y sumamos 1 para evitar problemas con ceros en los datos
+log_counts <- log10(assay(se, "counts") + 1)
+assay(se, "log_counts") <- log_counts  # Añadimos los datos log-transformados como un nuevo assay en SummarizedExperiment
+
+dim(assay(se, "log_counts"))  # Verificamos las dimensiones de la matriz
+colnames(assay(se, "log_counts"))  # Verificamos los nombres actuales de las columnas
+
+
+# Generamos el resumen estadístico de los datos transformados
+summary(assay(se, "log_counts"))
+
+```
+
+**Interpretación de los resultados**
+
+**Interpretación del Resumen Estadístico Tras la Transformación Logarítmica**
+
+1. **Rango y Reducción de Extremos**: Los valores máximos ahora están en torno a 7-8, con mínimos en 0, lo que indica que la transformación logarítmica ha reducido la influencia de valores extremadamente altos.
+
+2. **Mediana y Media Uniformes**: Las medianas y medias están entre 4 y 5 en todas las muestras, lo cual sugiere una distribución más equilibrada y menos sesgada tras la transformación.
+
+3. **Menor Variabilidad**: La reducción en la distancia entre cuartiles refleja una menor dispersión, mejorando la uniformidad en la distribución de los datos.
+
+En resumen, la transformación logarítmica ha normalizado los datos, haciéndolos más adecuados para análisis estadísticos posteriores.
+
+---
+
+##### **Visualización de abundancias en escala logarítmica: Histogramas y Boxplots**
+
+Agrupamos las réplicas de cada muestra con el mismo color para facilitar la visualización de la coherencia entre réplicas y distinguir las diferencias potenicales entre los grupos tumorales.
+
+Los boxplots en escala logarítmica permiten una comparación uniforme entre muestras, eliminando el sesgo de los valores extremos, lo que asegura que la normalización es adecuada para el análisis diferencial y facilita la evaluación de la variabilidad y comparabilidad entre muestras.
+
+
+```{r message = FALSE, warning = FALSE, echo=FALSE}
+
+# Convertimos el assay log-transformado a data.frame para facilitar la conversión a formato largo
+abundances_log_df <- as.data.frame(assay(se, "log_counts"))
+
+# Convertimos el data.frame a formato largo para ggplot2
+abundances_log_df_long <- abundances_log_df %>%
+  pivot_longer(cols = everything(), names_to = "sample", values_to = "log_abundance")
+
+# Combinamos con `targets` para añadir `Group` y `Replicate`
+# Hacemos un join con `targets` utilizando `sample` para identificar las muestras
+abundances_log_df_long <- abundances_log_df_long %>%
+  left_join(targets, by = c("sample" = "Sample...1"))
+
+# Renombramos columnas para que queden claras en el contexto de visualización
+colnames(abundances_log_df_long)[colnames(abundances_log_df_long) == "Phenotype"] <- "Group"
+colnames(abundances_log_df_long)[colnames(abundances_log_df_long) == "Individual"] <- "Replicate"
+
+# Convertimos `Replicate` a factor para evitar el error
+abundances_log_df_long$Replicate <- as.factor(abundances_log_df_long$Replicate)
+
+# Histogramas de abundancias log-transformadas por muestra
+ggplot(abundances_log_df_long, aes(x = log_abundance)) +
+  geom_histogram(bins = 30, fill = "#FF69B4", color = "black") +
+  facet_wrap(~ sample, scales = "free", ncol = 3) +
+  theme_minimal() +
+  labs(
+    title = "Distribución de Abundancias Log-transformadas de Fosfopéptidos por Muestra",
+    x = "Abundancia Log10",
+    y = "Frecuencia"
+  )
+
+
+# Boxplots diferenciados por grupo y réplica
+ggplot(abundances_log_df_long, aes(x = sample, y = log_abundance, fill = Group, colour = Replicate)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(
+    title = "Phosphoproteomics Abundances (log 10 scale) por Grupo y Réplica",
+    x = "Muestras",
+    y = "Abundancia Log10"
+  ) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  scale_fill_manual(values = c("MSS" = "#BA55D3", "PD" = "#FF69B4")) + # Colores para el grupo
+  scale_colour_manual(
+    values = c("1" = "#104E8B", "2" = "#8B0000", "3" = "#2E8B57", "4" = "#473C8B", "5" = "#6E7B8B", "6" = "#8B4C39"),
+    labels = c("1" = "M1", "2" = "M42", "3" = "M43", "4" = "M5", "5" = "M64", "6" = "MT49")  # Personalización de etiquetas
+  ) +
+  guides(
+    colour = guide_legend(title = "Réplica", override.aes = list(fill = NA)),  # Título de la leyenda
+    fill = guide_legend(title = "Grupo")
+  )
+
+```
+
+**Interpretación de los resultados**
+
+**Distribución Normalizada (Histogramas):**  
+La transformación logarítmica ha centralizado las abundancias de fosfopéptidos alrededor de valores medios (entre 3 y 7 en la escala logarítmica), reduciendo la variabilidad extrema y la asimetría. Esto facilita la comparación equitativa entre muestras, permitiendo identificar patrones más claros en los datos.
+
+**Variabilidad entre Grupos y Consistencia en Réplicas (Boxplots):**  
+Los boxplots muestran que, tras la transformación, las abundancias son consistentes entre réplicas, lo cual evidencia una buena reproducibilidad experimental. Aunque las diferencias entre los grupos MSS y PD son sutiles, el grupo PD presenta mayor variabilidad y algunos valores elevados, lo que podría indicar diferencias biológicas relevantes.
+
+**Interpretación Biológica**
+
+1. **Diferencias de Fosforilación entre MSS y PD:**  
+   El grupo PD muestra mayor variabilidad en los niveles de fosforilación, lo que sugiere una regulación diferencial de vías específicas de señalización. Esto puede estar vinculado con el comportamiento más agresivo del subtipo PD.
+
+2. **Identificación de Biomarcadores Potenciales:**  
+   Las diferencias observadas sugieren que algunos fosfopéptidos podrían actuar como biomarcadores específicos de cada grupo. Identificar estos fosfopéptidos ayudaría a clasificar mejor a los pacientes y a predecir respuestas a tratamientos.
+
+---
+
+**Conclusión**
+
+La exploración inicial y el control de calidad aseguran que los datos sean consistentes y estén listos para el análisis estadístico. Las visualizaciones y transformaciones permiten identificar patrones de variabilidad y garantizan que los datos tengan una distribución adecuada para las comparaciones entre los grupos MSS y PD. Este análisis también confirma que un filtro adaptativo no es necesario, ya que la transformación logarítmica es suficiente para normalizar la distribución de los datos sin perder información relevante en los fosfopeptidos de baja intensidad.
+
+
+---
+
+
+#### **5. Cuestiones sobre el Análisis Estadístico y la Identificación de Fosfopéptidos Diferenciales**
+
+El objetivo de este apartado es realizar un análisis estadístico exhaustivo para identificar fosfopéptidos cuya abundancia pueda distinguir entre los subtipos tumorales MSS y PD. La estrategia incluye un análisis exploratorio inicial mediante PCA y, posteriormente, pruebas estadísticas específicas con el paquete limma. La selección de técnicas de normalización y escalado se basa en las observaciones realizadas en cada paso, buscando reducir la variabilidad técnica y mejorar la precisión de la detección. Podemos caracterizar nuestro proceso de análisis intentando dar respuesta a las siguientes preguntas:
+
+##### **5.1 ¿Cómo se llevó a cabo el análisis estadístico? ¿Cuáles fueron los criterios utilizados para identificar fosfopéptidos que diferencian los grupos tumorales?**
+
+El análisis estadístico comenzó con un **análisis exploratorio preliminar mediante PCA**, en el cual se observaron patrones de agrupación que sugerían diferencias en los perfiles de fosforilación entre los subtipos. En particular, se identificó una separación inicial entre MSS y PD, aunque el grupo PD mostró una mayor heterogeneidad interna, con la muestra M43 destacándose como un posible caso atípico.
+
+Basándose en estos hallazgos preliminares, se procedió al análisis diferencial utilizando el paquete **`limma`**. Primero, se generó una **matriz de diseño** para definir las condiciones experimentales MSS y PD, y se estableció la comparación entre ambos subtipos mediante `makeContrasts`. Al analizar los resultados iniciales, los **Volcano Plots** revelaron una dispersión considerable en los datos, especialmente en PD, lo que evidenció la necesidad de una normalización adicional para reducir la variabilidad técnica y mejorar la precisión del análisis.
+
+Para abordar esta dispersión, se aplicó **Quantile Normalization**, una técnica que equilibra las distribuciones de abundancia entre las muestras, minimizando la variabilidad no biológica sin afectar las diferencias relativas entre grupos. Un nuevo PCA posterior a la normalización mostró una mejor agrupación entre MSS y PD, aunque M43 permanecía ligeramente separada.
+
+Con el objetivo de ajustar el modelo estadístico teniendo en cuenta esta muestra atípica, se utilizó **`arrayWeights`** en `limma`. Esta técnica asignó pesos adaptativos a las muestras en función de su contribución a la variabilidad total, reduciendo la influencia de M43 y otros posibles outliers, lo que permitió un ajuste más robusto y preciso en la identificación de fosfopéptidos diferencialmente abundantes.
+
+**Criterios de selección:**
+- **FDR < 0.05:** Para controlar la tasa de descubrimiento falso, se aplicó el método de Benjamini-Hochberg durante la extracción de resultados con `topTable`, ajustando los p-valores para reducir la probabilidad de falsos positivos en las múltiples pruebas realizadas.
+- **log Fold Change ≥ |1|:** Indicativo de un cambio de al menos el doble o la mitad en la abundancia, considerado biológicamente relevante.
+
+Finalmente, los **Volcano Plots** destacaron los fosfopéptidos con diferencias significativas y cambios biológicamente relevantes, identificando candidatos clave para análisis funcionales y estudios posteriores. Este enfoque integral garantizó un análisis estadístico robusto y confiable. 
+
+
+---
+
+**5.1.1. Análisis de Componentes Principales (PCA)** 
+
+   - **Objetivo**: El PCA es una herramienta exploratoria para observar la variabilidad global de los datos y detectar posibles patrones de agrupación que indiquen diferencias entre los grupos MSS y PD.
+   
+   - **Procedimiento**: Aplicamos el PCA sobre los datos de abundancia de fosfopéptidos, previamente transformados logarítmicamente, lo cual reduce el impacto de valores extremos y estabiliza la varianza.
+   
+   - **Visualización y Resultados**: Generamos un gráfico que muestra la distribución de las muestras en el espacio de los dos primeros componentes principales. Observamos si las muestras de MSS y PD forman grupos separados o si presentan patrones distintos.
+   
+   - **Interpretación**: Una agrupación clara de las muestras MSS y PD en el espacio del PCA proporciona una primera indicación de que existen diferencias entre estos grupos, lo que justifica los análisis de significancia estadística posteriores para identificar fosfopéptidos que diferencian a estos subtipos tumorales.
+
+
+---
+
+Para simplificar el análisis utilizamos una función disponible en github para dibujar un gráfico de dispersión a partir de los resultados de un PCA. 
+
+```{r message = FALSE, warning = FALSE, echo=FALSE}
+
+# Cargamos la función desde el repositorio GitHub
+source("https://raw.githubusercontent.com/uebvhir/UEB_PCA/master/UEB_plotPCA3.R")
+
+# Extraemos los datos log-transformados de fosfopéptidos directamente del objeto `SummarizedExperiment`
+log_counts <- assay(se, "log_counts")  # Obtenemos la matriz log-transformada
+
+# Realizamos el PCA usando la función `plotPCA3` y los datos log-transformados
+plotPCA3(
+  datos = as.matrix(log_counts),               # Usamos los datos ya log-transformados
+  labels = colnames(log_counts),               # Etiquetas de muestra (columnas)
+  factor = colData(se)$group,                  # Factor (grupo) obtenido de los metadatos en `se`
+  title = "Datos de Fosfoproteómica",          # Título del gráfico
+  scale = FALSE,                               # Desactivamos la estandarización, ya que el log10 ya está aplicado
+  colores = c("#BA55D3", "#FF69B4"),           # Colores personalizados para los grupos (ajustado a MSS y PD)
+  size = 3.5,                                  # Tamaño de los puntos
+  glineas = 2.5                                # Grosor de las líneas de agrupación
+)
+
+```
+
+**Interpretación de los resultados**
+
+El PCA en los datos de fosforilación muestra una clara separación entre los grupos MSS y PD en los primeros dos componentes principales (PC1 y PC2), lo cual sugiere patrones de fosforilación distintivos entre estos subtipos tumorales.
+
+**Interpretación de los Componentes Principales (PC1 y PC2)**
+
+1. **PC1 (32% de variabilidad)**: La mayor parte de la variabilidad entre las muestras (32%) se explica a lo largo del eje PC1. En este eje, observamos que las muestras del grupo PD tienden a agruparse en el lado derecho, mientras que las del grupo MSS se concentran en el lado izquierdo. Esto indica que las diferencias en fosforilación capturadas por PC1 son significativas para distinguir entre los dos grupos.
+
+2. **PC2 (17.5% de variabilidad)**: El segundo componente principal, que captura un 17.5% adicional de la variabilidad, no muestra una separación tan clara entre MSS y PD. Sin embargo, contribuye a explicar la distribución de las muestras dentro de cada grupo, sugiriendo variabilidad interna.
+
+**Observaciones por Grupo**
+
+- **Grupo MSS (puntos morados)**: Las muestras de MSS se agrupan en el cuadrante superior izquierdo, lo cual sugiere que tienen un perfil de fosforilación similar entre ellas. Esto indica una mayor homogeneidad en los patrones de fosforilación de este grupo, que puede estar asociado con características biológicas menos agresivas.
+  
+- **Grupo PD (puntos rosas)**: Las muestras de PD se distribuyen en el cuadrante derecho y tienden a mostrar mayor variabilidad en su perfil de fosforilación. Esta dispersión puede reflejar una mayor heterogeneidad biológica y podría estar asociada con la activación de vías específicas que promuevan la agresividad y resistencia en el tumor. Sin embargo, también podría deberse a una variabilidad técnica (que es lo más probable) lo que podría interferir con la precisión en la identificación de fosfopéptidos diferencialmente abundantes.
+
+---
+
+**5.1.2. Análisis de Diferencias entre Grupos con `limma`** 
+
+   - **Preparación del Diseño Experimental**: Creamos una matriz de diseño que asigna cada muestra a su grupo correspondiente (MSS o PD) y aplicamos `duplicateCorrelation` para ajustar la variabilidad técnica asociada a las réplicas.
+   
+   - **Definición de Comparaciones y Contrastes**: Definimos un contraste para comparar los grupos PD vs. MSS, permitiendo a `limma` evaluar las diferencias en la abundancia de fosfopéptidos entre estos subtipos tumorales.
+   
+   - **Ajuste del Modelo y Cálculo de Significancia**: Ajustamos el modelo estadístico con `eBayes`, que aplica un ajuste Bayesiano para estabilizar las estimaciones de variabilidad y aumentar la robustez del análisis. Utilizamos un p-valor ajustado (tasa de descubrimiento falso, FDR) y un log Fold Change como criterios para identificar fosfopéptidos diferencialmente abundantes entre los grupos.
+   
+   - **Criterios de Identificación**: Fosfopéptidos con un log Fold Change significativo (positivo o negativo) y un p-valor ajustado inferior a un umbral predefinido (0.05) se consideran diferencialmente abundantes. Estos criterios aseguran que los fosfopéptidos identificados no solo son estadísticamente significativos sino que también tienen una magnitud de cambio que es biológicamente relevante.
+
+   - **Visualización de Resultados**: Utilizamos un Volcano Plot para visualizar los fosfopéptidos que tienen cambios significativos en la abundancia entre los grupos MSS y PD, mostrando tanto el log Fold Change como el p-valor.
+
+
+---
+
+**Preparación del Diseño Experimental**
+
+El análisis estadístico con `limma` requiere la creación de una matriz de diseño que asigne las muestras a los grupos experimentales (MSS y PD). Esto permite modelar el efecto de grupo en la abundancia de los fosfopéptidos.
+
+
+```{r message = FALSE, warning = FALSE, echo=FALSE}
+
+# Creamos una matriz de diseño para definir los grupos tumorales MSS y PD
+# `model.matrix` crea una matriz de diseño basada en el grupo experimental de cada muestra
+# Definimos los grupos desde `metadata` para cumplir con los requisitos de la PEC que solicita que los datos se organicen en el contenedor `SummarizedExperiment`
+groups <- factor(metadata$group)                        
+designMatrix <- model.matrix(~ -1 + groups)             # Creamos una matriz de diseño sin intercepto
+colnames(designMatrix) <- levels(groups)                # Asignamos nombres a las columnas según los grupos
+show(designMatrix)                                      # Mostramos la matriz de diseño
+
+
+```
+
+---
+
+**Corrección de Réplicas Técnicas con `duplicateCorrelation`**
+
+Para tener en cuenta las réplicas técnicas (ya que cada muestra se analizó por duplicado), aplicamos `duplicateCorrelation` para estimar y corregir la correlación entre réplicas en el modelo estadístico. Esto permite modelar de manera más fiel las diferencias reales entre los subtipos tumorales, evitando el ruido técnico.
+
+
+```{r message = FALSE, warning = FALSE, echo=FALSE}
+
+# Aplicamos `duplicateCorrelation` para corregir la correlación entre réplicas técnicas
+# Esta función estima la correlación entre réplicas de cada muestra, lo que ayuda a controlar
+# el impacto de variaciones técnicas en el modelo estadístico
+dupcor <- duplicateCorrelation(assay(se, "log_counts"), designMatrix, block = metadata$individual)
+dupcor$consensus.correlation   # Imprimimos la correlación promedio entre réplicas
+
+```
+
+**Interpretación de los resultados**
+
+La correlación de **0.818** entre réplicas técnicas indica una alta consistencia y buena reproducibilidad en las mediciones. Este valor permite que `limma` ajuste eficazmente las diferencias técnicas, enfocándose en variaciones biológicas reales entre los grupos `MSS` y `PD`, y aumentando la confiabilidad del análisis diferencial.
+
+---
+
+**Definición de Comparaciones con la Matriz de Contrastes**
+
+La matriz de contraste (`contrast_matrix`) define la comparación PD vs. MSS, permitiendo que `limma` evalúe las diferencias en los niveles de fosfopéptidos entre estos dos grupos. 
+
+Mediante este paso definimos las comparaciones necesarias para detectar fosfopéptidos diferencialmente abundantes entre MSS y PD.
+
+```{r message = FALSE, warning = FALSE, echo=FALSE}
+
+# Matriz de contraste para comparar PD y MSS
+contrast_matrix <- makeContrasts(PD_vs_MSS = PD - MSS, levels = designMatrix)
+show(contrast_matrix)  # Mostramos la matriz de contraste para verificar que está configurada correctamente.
+
+```
+
+**Interpretación de los resultados**
+
+El valor `1` asignado a `PD` y `-1` a `MSS` indica que el análisis identificará los fosfopéptidos con diferencias en la abundancia entre estos grupos, donde los valores positivos reflejarán mayor abundancia en `PD` y los negativos en `MSS`.
+
+---
+
+**Ajuste del Modelo y Pruebas de Significación con `limma`**
+
+Aplicamos el modelo lineal y ajustamos las comparaciones para obtener un análisis de las diferencias significativas en la abundancia de fosfopéptidos.
+
+Para asegurar que las diferencias observadas no son el resultado del azar, se utilizó la corrección por FDR aplicando el método de **Benjamini-Hochberg** (realizado en el paso con `topTable`). Este ajuste controla la proporción de falsos positivos, asegurando una mayor confiabilidad en los fosfopéptidos identificados.
+
+El análisis con `eBayes` aplicado al modelo ajustado permite calcular p-valores y fold changes para cada fosfopéptido entre PD y MSS, aplica un ajuste bayesiano a los errores estándar del modelo mejorando la precisión de los resultados. El ajuste de p-valores (Benjamini-Hochberg) controla el error de falso descubrimiento, proporcionando una lista de fosfopéptidos que presentan cambios significativos entre los grupos.
+
+```{r message = FALSE, warning = FALSE, echo=FALSE}
+
+# Ajuste del modelo y análisis estadístico
+# Realizamos el ajuste del modelo de expresión con el paquete `limma`
+fit <- lmFit(assay(se, "log_counts"), designMatrix, block = metadata$individual, correlation = dupcor$consensus.correlation)
+fit2 <- contrasts.fit(fit, contrast_matrix)               # Aplicamos la matriz de contraste al ajuste
+fit2 <- eBayes(fit2)                              # Realizamos el ajuste bayesiano para obtener p-valores ajustados
+
+# Extraemos los resultados 
+# Usamos `topTable` para obtener los fosfopéptidos con diferencias significativas en abundancia entre los grupos
+# `adjust = "BH"` aplica la corrección de Benjamini-Hochberg para controlar la FDR
+# `nrow(log_counts)` especifica que queremos incluir todos los fosfopéptidos en los resultados
+results <- topTable(fit2, adjust = "BH", number = nrow(assay(se, "log_counts")))
+head(results)  # Mostramos los primeros resultados de los fosfopeptidos con diferencias significativas.
+
+```
+
+**Interpretación de los resultados**
+
+Los resultados del análisis son una tabla donde las proteínas, se ordenan de mayor a menor expresión diferencial según los resultados de la comparación realizada.
+
+
+**Interpretación Estadística**
+
+El resumen del análisis con Limma muestra una tabla de los fosfopéptidos más diferencialmente abundantes, con columnas para `logFC` (cambio en el logaritmo de la expresión), `AveExpr` (expresión promedio), `t`, `P.Value`, `adj.P.Val` (valor p ajustado), y `B`:
+
+- **logFC**: Indica el cambio en la abundancia de cada fosfopéptido entre PD y MSS (representa el cambio de expresión en logaritmo base 2 (log fold-change)). Valores positivos sugieren mayor abundancia en el grupo PD en comparación con MSS, mientras que un valor negativo reflejaría lo contrario.
+
+- **AveExpr**: Es la expresión promedio del fosfopéptido en todos los grupos, indicando el nivel medio de abundancia.
+
+- **t**: Valor t del test estadístico, que indica la magnitud de la diferencia relativa a la variabilidad.
+
+- **P.Value** y **adj.P.Val**: Representan la significancia estadística de los cambios observados. Valores de `adj.P.Val` bajos indican diferencias significativas en la abundancia entre los grupos, siendo estos fosfopéptidos candidatos a biomarcadores.
+
+- **B-value**: Proporciona una medida de la probabilidad logarítmica de que el fosfopéptido sea diferencialmente expresado. Cuanto mayor sea el B-value, mayor es la confianza en que ese fosfopéptido presenta una diferencia significativa en abundancia entre MSS y PD.
+
+
+**Interpretación Biológica**
+
+- **Fosfopéptidos con altos valores de logFC y significancia estadística**: Los fosfopéptidos con los valores de |logFC| más altos y los p-valores ajustados más bajos son candidatos para investigaciones futuras, ya que probablemente representan  biomarcadores de los subtipos tumorales o proteínas involucradas en vías de señalización diferencialmente activas entre los dos grupos.
+
+- **Significado Biológico del logFC**: Se suele considerar un cambio de abundancia biológicamente relevante cuando el |logFC| es mayor a 1, lo que indica al menos un cambio de dos veces en la abundancia entre grupos. Este umbral ayuda a identificar fosfopéptidos con cambios de abundancia que pueden tener implicaciones funcionales importantes en los procesos tumorales.
+
+
+**Visualización de Resultados: Volcano Plot**
+
+El **Volcano Plot** visualiza los fosfopéptidos diferencialmente abundantes en un solo gráfico, facilitando la identificación de aquellos que tienen cambios significativos tanto en términos de fold change como de p-valor.
+Los puntos alejados de los ejes indican fosfopéptidos con cambios biológicamente relevantes (log fold change alto) y estadísticamente significativos (p-valor bajo), que son los más prometedores como biomarcadores de los subtipos tumorales.
+
+```{r message = FALSE, warning = FALSE, echo=FALSE}
+
+# Visualizamos los fosfopéptidos diferenciales con Volcano Plot
+# Usamos la biblioteca `EnhancedVolcano` para crear un Volcano Plot,
+# que es útil para visualizar fosfopéptidos con cambios significativos en abundancia
+
+# Creamos el Volcano Plot utilizando los resultados del análisis diferencial
+EnhancedVolcano(results,                  # `results` es el conjunto de datos que contiene los resultados del análisis diferencial
+                lab = rownames(results),  # `lab` define las etiquetas de los puntos en el gráfico, en este caso los nombres de los fosfopéptidos
+                x = 'logFC',              # `x` establece el eje X como el log fold change (logFC), que indica el cambio de abundancia entre grupos
+                y = 'P.Value',            # `y` define el eje Y como el valor p (P.Value), que indica la significancia estadística de los cambios
+                title = 'Volcano Plot: MSS vs PD',  # `title` define el título del gráfico, que indica la comparación entre los grupos MSS y PD
+                pCutoff = 0.05,           # `pCutoff` establece el umbral de significancia para los valores p (0.05), resaltando puntos con p < 0.05
+                FCcutoff = 1,             # `FCcutoff` establece el umbral de significancia para el fold change (logFC > 1 o < -1)
+                pointSize = 3.0,          # `pointSize` ajusta el tamaño de los puntos en el gráfico, haciendo los puntos más visibles
+                labSize = 3.5)            # `labSize` ajusta el tamaño de las etiquetas, haciendo las etiquetas más legibles en el gráfico
+
+
+```
+
+**Interpretación de los resultados**
+
+El Volcano Plot muestra la relación entre la magnitud de cambio (log2 fold change) y la significancia estadística (-log10 p-value) de cada fosfopéptido al comparar los subtipos tumorales MSS y PD.
+
+1. **Ejes**:
+
+   - **Eje X (log2 fold change)**: Representa la magnitud de cambio en la abundancia de los fosfopéptidos entre MSS y PD. Valores positivos indican una mayor abundancia en el grupo PD, mientras que valores negativos reflejan una mayor abundancia en MSS.
+   
+   - **Eje Y (-log10 p-value)**: Indica la significancia estadística. Los puntos más altos en este eje representan fosfopéptidos con p-valores más bajos (es decir, mayor significancia).
+
+2. **Color de los Puntos**:
+
+   - Los puntos **rojos** destacan fosfopéptidos que presentan diferencias significativas en ambas dimensiones: tanto en el cambio de abundancia (log2 FC) como en la significancia estadística.
+   
+   - Los puntos **azules** y **verdes** representan fosfopéptidos que alcanzan significancia en sólo una de las dimensiones (p-value o log2 fold change), mientras que los puntos **grises** no alcanzan los umbrales de significancia en ninguna de las dos.
+
+3. **Fosfopéptidos Significativos**:
+
+   - Algunos fosfopéptidos, como aquellos etiquetados (Q9P206.1, Q5SW79, etc.), se destacan como significativamente diferentes entre los grupos MSS y PD con un cambio de abundancia importante y p-valores bajos. Estos podrían ser candidatos interesantes para distinguir entre los dos subtipos tumorales.
+   
+   - Los fosfopéptidos que destacan como significativos en el Volcano Plot están presentes en ambos subtipos tumorales (MSS y PD) pero muestran niveles de fosforilación diferentes entre los grupos.
+
+4. **Distribución y Variabilidad**:
+
+   - La dispersión considerable de puntos sugiere una variabilidad, posiblemente de origen técnico o biológico, que podría estar enmascarando diferencias sutiles entre grupos. La revisión de la normalización y el escalado podría ayudar a reducir esta variabilidad, permitiendo que los fosfopéptidos con diferencias importantes se destaquen más claramente.
+
+
+---
+
+**5.1.3. Evaluación de la Normalización: Resumen Estadístico y Dispersión**
+
+A pesar de la transformación logarítmica inicial, el análisis de PCA y `limma` reveló una alta variabilidad en las muestras de PD, lo que podría complicar la identificación precisa de fosfopéptidos diferenciales. Este hallazgo justificó la aplicación de una normalización adicional.
+
+Al analizar el resumen estadístico de los datos log-transformados, observamos que, aunque la transformación mejoró la homogeneidad, persistía una variabilidad notable, especialmente en los cuartiles y valores máximos del grupo PD. Para reducir esta variabilidad técnica sin afectar las diferencias biológicas, se optó por **Quantile Normalization**, que homogeneiza las distribuciones de abundancia entre muestras y mejora su comparabilidad.
+
+---
+
+**Normalización de datos con Quantile Normalization**
+
+Esta técnica ajusta las distribuciones de abundancia de todas las muestras para que sean comparables entre sí, eliminando así la variabilidad técnica sin afectar las relaciones relativas entre fosfopéptidos.
+  
+```{r message = FALSE, warning = FALSE, echo=FALSE}
+
+# Aplicamos la normalización por cuantiles a los datos log-transformados
+# `normalize.quantiles` ajusta las distribuciones de todas las columnas para que sean idénticas, 
+# reduciendo la variabilidad técnica entre muestras.
+log_counts_quantile <- normalize.quantiles(as.matrix(log_counts))
+
+# Asignamos los nombres originales de las columnas (muestras) a la matriz normalizada
+# para mantener la coherencia y facilitar el seguimiento de las muestras.
+colnames(log_counts_quantile) <- colnames(log_counts)
+
+# Asignamos los nombres originales de las filas (fosfopéptidos) a la matriz normalizada
+# para conservar la correspondencia de los datos transformados con los fosfopéptidos.
+rownames(log_counts_quantile) <- rownames(log_counts)
+
+# Almacenamos la matriz normalizada como un nuevo assay en el objeto `SummarizedExperiment`
+# para integrar los datos normalizados por cuantiles y facilitar su manipulación posterior en el análisis.
+assay(se, "log_counts_quantile") <- log_counts_quantile
+
+# Realizamos un PCA con los datos normalizados por cuantiles para evaluar si la normalización
+# mejoró la agrupación y redujo la variabilidad entre las muestras de los distintos grupos.
+plotPCA3(
+  datos = as.matrix(assay(se, "log_counts_quantile")),  # Utilizamos la matriz de datos normalizados por cuantiles.
+  labels = colnames(assay(se, "log_counts_quantile")),  # Etiquetas de cada muestra, basadas en los nombres de columnas.
+  factor = colData(se)$group,                           # Factor de grupo (MSS o PD) obtenido de los metadatos de `se`.
+  title = "PCA después de Quantile Normalization: Datos de Fosfoproteómica", # Título descriptivo para el gráfico.
+  scale = FALSE,                                        # Desactivamos la estandarización adicional, ya que los datos ya están normalizados.
+  colores = c("#BA55D3", "#FF69B4"),                    # Colores personalizados para diferenciar los grupos MSS y PD.
+  size = 3.5,                                           # Tamaño de los puntos para mejorar la legibilidad.
+  glineas = 2.5                                         # Grosor de las líneas de agrupación para destacar las separaciones.
+)
+
+# Generamos un resumen estadístico de los datos normalizados para verificar la homogeneidad
+# en la distribución de los datos y evaluar la efectividad de la normalización por cuantiles.
+summary(assay(se, "log_counts_quantile"))
+
+```
+
+**Interpretación de los resultados**
+
+Tras aplicar la normalización por cuantiles y realizar el PCA, los resultados sugieren una distribución de muestras más homogénea en comparación con el análisis inicial. La normalización ha ayudado a minimizar la variabilidad técnica, especialmente dentro del grupo PD, que inicialmente mostraba una alta dispersión.
+
+Tras aplicar la normalización por cuantiles y realizar el PCA, los resultados sugieren una distribución de muestras más homogénea en comparación con el análisis inicial. La normalización ha ayudado a minimizar la variabilidad técnica, especialmente dentro del grupo PD, que inicialmente mostraba una alta dispersión.
+
+
+**Interpretación del PCA tras la Quantile Normalization:**
+
+1. **Separación entre grupos:** Se mantiene una diferenciación clara entre los grupos MSS y PD en el espacio de los componentes principales (PC1 y PC2), lo que respalda la existencia de perfiles de fosforilación distintos entre estos subtipos tumorales.
+   
+2. **Reducción de la dispersión en PD:** En comparación con el PCA previo a la normalización, las muestras del grupo PD muestran una menor variabilidad, evidenciando que la Quantile Normalization ha reducido la heterogeneidad técnica en este grupo. Sin embargo, la muestra M43 en PD aún se encuentra algo alejada del resto de las muestras de su grupo. Esto sugiere que M43 podría estar afectada por variabilidad técnica residual o biológica, o representar una subpoblación o caso atípico dentro del grupo PD.
+
+3. **Componentes principales (PC1 y PC2):** PC1 sigue explicando un porcentaje significativo de la variabilidad entre grupos, con PC2 capturando una parte adicional, aunque menor. Esto refuerza que las diferencias observadas entre MSS y PD son capturadas de manera adecuada y que la normalización ha permitido observar patrones más claros en los datos.
+
+La Quantile Normalization ha mejorado la comparabilidad entre las muestras y reducido el impacto de variabilidad técnica.  Aunque M43 se mantiene algo alejada de las otras muestras PD, la distribución general es más homogénea, lo cual debería facilitar la identificación de diferencias biológicas significativas en el análisis estadístico posterior con limma. En análisis futuros, podría considerarse un tratamiento especial para M43 si continúa mostrando un comportamiento atípico, ya que su inclusión sin ajuste adicional podría influir en los resultados de comparación entre MSS y PD.
+
+**Interpretación del Resumen Estadístico tras la Quantile Normalization:**
+
+1. **Mediana uniforme en todas las muestras:** La mediana de las abundancias log-transformadas es exactamente la misma (4.593) para todas las muestras. Este es un efecto esperado de la normalización por cuantiles, que asegura que las distribuciones de las muestras sean comparables, lo cual ayuda a eliminar variaciones técnicas.
+
+2. **Consistencia en los cuartiles y valores máximos:** Los valores del primer y tercer cuartil, así como los valores máximos, son prácticamente idénticos entre las muestras. Esto sugiere que la normalización ha ajustado las distribuciones de cada muestra para que tengan una variabilidad similar en términos de dispersión y rango, eliminando así las diferencias técnicas que no son biológicamente significativas.
+
+3. **Disminución de la variabilidad técnica:** La homogeneidad en la distribución de las muestras indica que se ha reducido la variabilidad técnica observada previamente, especialmente en el grupo PD. Esta homogeneidad mejorará la precisión en la comparación de los fosfopéptidos entre los grupos MSS y PD en los análisis estadísticos posteriores.
+
+**Observación sobre M43:** Aunque en el PCA la muestra M43 del grupo PD sigue mostrando un comportamiento ligeramente atípico, el resumen estadístico no presenta valores inusuales en comparación con otras muestras. Esto sugiere que la diferencia observada en el PCA podría estar relacionada con variabilidad biológica o características específicas de M43, más que con problemas técnicos.
+
+La **Quantile Normalization** ha homogenizado las distribuciones de abundancia de los fosfopéptidos entre todas las muestras, facilitando comparaciones directas entre MSS y PD sin el sesgo de variabilidad técnica. Este ajuste debería permitir una identificación más precisa de fosfopéptidos diferencialmente abundantes en los análisis posteriores.
+
+---
+
+**5.1.4 Análisis Estadístico con limma y arrayWeights**
+
+Para identificar fosfopéptidos diferencialmente abundantes entre MSS y PD, aplicamos `limma` tras la normalización por cuantiles. Aunque esta normalización redujo la variabilidad, el PCA aún mostraba que la muestra M43 en el grupo PD permanecía algo dispersa. Para ajustar este efecto, usamos `arrayWeights`, que asigna pesos adaptativos a las muestras, minimizando la influencia de aquellas con variabilidad residual. Este enfoque proporciona un análisis más robusto y permite detectar biomarcadores con mayor precisión.
+
+```{r message = FALSE, warning = FALSE, echo=FALSE}
+
+# Preparación del diseño experimental y pesos con arrayWeights
+
+# Definimos los grupos experimentales (MSS y PD) como factores a partir de la columna `group` en `metadata`
+groups <- factor(metadata$group)
+
+# Creamos una matriz de diseño para el análisis de limma, especificando los grupos
+# `model.matrix(~ -1 + groups)` crea una matriz de diseño sin intercepto,
+# lo que facilita la comparación entre grupos (MSS y PD) sin incluir una constante
+designMatrix <- model.matrix(~ -1 + groups)
+
+# Asignamos nombres a las columnas de la matriz de diseño según los niveles de los grupos (MSS y PD)
+colnames(designMatrix) <- levels(groups)
+
+# Aplicación de arrayWeights para ajustar pesos de cada muestra
+
+# Calculamos los pesos de cada muestra usando `arrayWeights`, que asigna un peso adaptativo 
+# según la variabilidad de cada muestra en relación con el diseño experimental. 
+# Esto ayuda a reducir el impacto de muestras con mayor variabilidad residual.
+weights <- arrayWeights(assay(se, "log_counts_quantile"), designMatrix)
+
+# Definición del contraste y ajuste del modelo con duplicateCorrelation y eBayes
+
+# Calculamos la correlación entre réplicas técnicas utilizando `duplicateCorrelation`,
+# lo que permite ajustar el modelo estadístico para considerar las dependencias entre réplicas
+# `block = metadata$individual` indica que el agrupamiento se realiza por individuos en `metadata`
+dupcor <- duplicateCorrelation(assay(se, "log_counts_quantile"), designMatrix, block = metadata$individual)
+
+# Creamos una matriz de contraste para comparar el grupo PD con el grupo MSS
+# `makeContrasts(PD_vs_MSS = PD - MSS, levels = designMatrix)` define el contraste
+# como la diferencia entre los grupos PD y MSS
+contrast_matrix <- makeContrasts(PD_vs_MSS = PD - MSS, levels = designMatrix)
+
+# Ajuste del modelo lineal usando `lmFit`, incluyendo pesos de las muestras (`weights`),
+# bloque de réplicas técnicas (`block`), y la correlación de réplicas calculada anteriormente
+fit <- lmFit(assay(se, "log_counts_quantile"), designMatrix, weights = weights, block = metadata$individual, correlation = dupcor$consensus.correlation)
+
+# Aplicamos la matriz de contraste al modelo ajustado para especificar la comparación deseada (PD vs MSS)
+fit <- contrasts.fit(fit, contrast_matrix)
+
+# Calculamos los p-valores y otros estadísticos de significancia ajustados usando `eBayes`,
+# que aplica un ajuste bayesiano para mejorar la robustez del análisis estadístico
+fit <- eBayes(fit)
+
+# Extracción de resultados significativos
+
+# Extraemos una tabla de los fosfopéptidos con diferencias significativas entre los grupos
+# Usamos `topTable` para mostrar los resultados ordenados por significancia ajustada
+# `adjust = "BH"` aplica la corrección de Benjamini-Hochberg para el control de la tasa de descubrimiento falso
+# `number = nrow(assay(se, "log_counts_quantile"))` indica que queremos incluir todos los fosfopéptidos en la tabla de resultados
+results <- topTable(fit, adjust = "BH", number = nrow(assay(se, "log_counts_quantile")))
+
+# Mostramos las primeras filas de los resultados para una vista preliminar
+head(results)
+
+
+```
+
+**Interpretación de los resultados**
+
+La tabla muestra fosfopéptidos con diferencias significativas en abundancia entre los subtipos tumorales MSS y PD, calculados con `limma` y `arrayWeights` tras la normalización por cuantiles. A continuación, se destacan las columnas clave:
+
+- **logFC**: Mide el cambio en la abundancia entre PD y MSS en log2. Valores positivos indican mayor abundancia en PD; valores negativos, en MSS.
+
+- **adj.P.Val**: Muestra la significancia estadística ajustada. Valores bajos sugieren diferencias estadísticamente significativas tras corrección por FDR.
+
+- **B**: Representa la probabilidad logarítmica de que el fosfopéptido sea diferencialmente expresado, con valores altos indicando mayor confianza en la diferencia.
+
+Fosfopéptidos como **Q9P206.1** y **Q53RY4** destacan con logFC altos y significancia estadística, sugiriendo que podrían diferenciar efectivamente entre MSS y PD. Estos fosfopéptidos representan candidatos clave para estudios futuros sobre biomarcadores o mecanismos moleculares específicos de cada subtipo.
+
+
+---
+
+**5.1.5 Visualización de Resultados con Volcano Plot**
+
+El Volcano Plot permite visualizar fosfopéptidos con cambios significativos tanto en el log2 fold change como en el p-valor, destacando los más relevantes como posibles biomarcadores.
+
+```{r message = FALSE, warning = FALSE, echo=FALSE}
+
+# Volcano Plot con EnhancedVolcano
+EnhancedVolcano(results,
+                lab = rownames(results),
+                x = 'logFC',
+                y = 'P.Value',
+                title = 'Volcano Plot: MSS vs PD',
+                pCutoff = 0.05,
+                FCcutoff = 1,
+                pointSize = 3.0,
+                labSize = 3.5)
+
+```
+
+**Interpretación de los resultados**:
+
+En el Volcano Plot posterior a la normalización por Quantile Normalization, se observa una mejora en la distribución de los fosfopéptidos, permitiendo una En el Volcano Plot tras la normalización con Quantile Normalization, se observa una clara mejora en la diferenciación de fosfopéptidos significativos entre los subtipos tumorales MSS y PD. La normalización ha reducido la variabilidad técnica, especialmente en el grupo PD, permitiendo que los fosfopéptidos diferencialmente abundantes se destaquen con mayor claridad.
+
+1. **Fosfopéptidos Significativos**: Los puntos en rojo, situados en los extremos del gráfico, representan fosfopéptidos con diferencias significativas tanto en log2 fold change como en p-valor. Fosfopéptidos como Q9P206.1 (con un log2 fold change positivo) sugieren una mayor abundancia en PD, mientras que otros, como Q9UQ35.22, tienen mayor abundancia en MSS.
+
+2. **Eficacia de la Normalización**: La Quantile Normalization ha mejorado la consistencia entre muestras, resaltando los fosfopéptidos con diferencias biológicamente relevantes entre MSS y PD, lo cual facilita la identificación de posibles biomarcadores tumorales para diferenciar estos subtipos.
+
+
+--- 
+
+**5.1.6 Integramos los datos en el contenedor `SummarizedExperiment`**
+
+Reorganizamos los resultados dentro de SummarizedExperiment para tener todos los datos en un solo contenedor, facilitando el acceso y la gestión de datos a lo largo del proceso.
+
+```{r message = FALSE, warning = FALSE, echo=FALSE}
+
+# 1. Guardamos los resultados de `limma` en el objeto `SummarizedExperiment`
+
+rowData(se)$logFC <- results$logFC
+rowData(se)$AveExpr <- results$AveExpr
+rowData(se)$P.Value <- results$P.Value
+rowData(se)$adj.P.Val <- results$adj.P.Val
+rowData(se)$B <- results$B
+
+```
+
+--- 
+
+##### **5.2 ¿Cómo se controló la tasa de descubrimiento falso (FDR) en el análisis?**
+
+La tasa de descubrimiento falso (FDR) se controló aplicando el método de **Benjamini-Hochberg** durante el análisis con `limma`. Este ajuste se realizó al extraer los resultados mediante `topTable` con el parámetro `adjust = "BH"`. 
+
+El método reordena los p-valores y ajusta los umbrales de significancia, reduciendo la probabilidad de falsos positivos en las múltiples pruebas realizadas. Para validar la confiabilidad de los fosfopéptidos seleccionados, se generaron **Volcano Plots**, que permitieron verificar visualmente la relación entre log Fold Change y significancia estadística.
+
+--- 
+
+##### **5.3 ¿Cómo se interpretan los valores de log Fold Change y qué nivel de cambio de abundancia se considera biológicamente relevante?**
+
+El **log Fold Change (logFC)** mide el cambio en la abundancia de un fosfopéptido entre los grupos PD y MSS, expresado en escala logarítmica base 2:
+
+- **logFC positivo:** Mayor abundancia en PD.
+
+- **logFC negativo:** Mayor abundancia en MSS.
+
+Un **logFC ≥ |1|** se consideró biológicamente relevante, ya que indica un cambio de al menos el doble o la mitad en la abundancia. Este umbral es ampliamente aceptado en estudios de proteómica, ya que garantiza que las diferencias detectadas tengan implicaciones funcionales o biológicas significativas. Además, este criterio fue validado mediante PCA, que mostró que los fosfopéptidos seleccionados contribuían a la separación biológica observada entre MSS y PD.
+
+---
+
+##### **5.4 ¿Qué herramientas estadísticas o métodos se utilizaron para garantizar la robustez de los resultados?**
+
+
+Para garantizar la robustez de los resultados, se implementaron las siguientes herramientas y métodos:
+
+1. **Quantile Normalization:** Reduciendo la variabilidad técnica entre muestras, se aseguraron distribuciones homogéneas de abundancia, mejorando la comparabilidad entre MSS y PD.
+
+2. **`limma` con `arrayWeights`:** Este ajuste asignó pesos adaptativos a las muestras con mayor variabilidad residual, reduciendo la influencia de outliers como la muestra M43 en PD.
+
+3. **`duplicateCorrelation`:** Modeló la correlación entre réplicas técnicas, asegurando que la variabilidad entre ellas no comprometiera los resultados.
+4. **Ajuste Bayesiano (`eBayes`):** Estabilizó los errores estándar estimados, aumentando la precisión en la identificación de diferencias significativas.
+
+5. **Control de FDR con Benjamini-Hochberg:** Ajustó los p-valores para minimizar falsos positivos.
+
+6. **Validación visual:** Se utilizaron **Volcano Plots** y análisis **PCA** para verificar que las diferencias detectadas reflejaban variaciones biológicas reales y no artefactos técnicos.
+
+En conjunto, estas herramientas aseguraron resultados confiables y estadísticamente robustos, proporcionando una base sólida para la identificación de fosfopéptidos diferencialmente abundantes y su interpretación biológica. 
+
+---
+
+#### **6: Análisis de Significación Biológica con Enriquecimiento Funcional**
+
+---
+
+**Objetivo:**  
+
+El objetivo de este apartado es identificar procesos biológicos, funciones moleculares y vías de señalización asociadas a los fosfopéptidos diferencialmente abundantes en los subtipos tumorales MSS y PD, con el fin de comprender las funciones específicas y mecanismos que podrían diferenciar cada subtipo tumoral.
+
+En otras palabras, se pretende identificar y caracterizar biológicamente fosfopéptidos diferencialmente abundantes en los subtipos tumorales MSS y PD, explorando su potencial como biomarcadores y su participación en procesos y vías clave en el cáncer.
+
+---
+
+**Cuestiones clave:**
+
+Para conseguir dicho objetivo planteamos una serie de cuestiones que caracterizaran el proceso de análisis a seguir:
+
+##### **6.1 ¿Qué procesos biológicos, funciones moleculares y vías de señalización están enriquecidos en los grupos de fosfopéptidos diferencialmente abundantes de MSS y PD?**
+
+El análisis de enriquecimiento funcional reveló diferencias clave entre los subtipos tumorales MSS y PD. En PD, los fosfopéptidos diferencialmente abundantes estaban asociados a procesos relacionados con la proliferación celular, migración e invasión, así como a la remodelación del citoesqueleto. Entre las rutas de señalización más destacadas se encontraban **MAPK/ERK** y **PI3K/AKT**, que desempeñan un papel central en la progresión tumoral al impulsar la división celular descontrolada y la capacidad de migración e invasión. Estas características son indicativas del perfil más agresivo de PD.
+
+En contraste, en MSS se identificaron procesos más relacionados con la homeostasis celular, la regulación metabólica y la apoptosis. Las rutas asociadas incluyeron mecanismos de respuesta al estrés oxidativo y control del ciclo celular, que reflejan un perfil más estable y menos agresivo. Estas diferencias entre MSS y PD subrayan cómo los subtipos tumorales activan diferentes vías biológicas en función de sus características moleculares y clínicas.
+
+Para llevar a cabo este análisis, se utilizó **ClusterProfiler** junto con bases de datos como **GO (Gene Ontology)**, **KEGG**, y **Reactome**, permitiendo mapear los fosfopéptidos a procesos biológicos, funciones moleculares y rutas metabólicas específicas. Además, herramientas como **ReactomePA**, **UniProt**, y **BioMart** facilitaron la anotación y contextualización de los fosfopéptidos, proporcionando una interpretación funcional detallada. Los resultados se visualizaron mediante **Dot Plots**, **Enrichment Maps**, y **Network Plots**, que destacaron las diferencias funcionales más significativas entre MSS y PD.
+
+##### **6.2 ¿Qué funciones moleculares específicas están asociadas a los fosfopéptidos diferencialmente abundantes en MSS o PD, y cómo se relacionan con la progresión tumoral?**
+
+En **PD**, las funciones moleculares más destacadas incluyeron la **actividad de quinasa** y la **unión a receptores de membrana**, que impulsan rutas activas como **MAPK/ERK** y **PI3K/AKT**. Estas funciones están directamente relacionadas con la proliferación celular, la migración y la invasión tumoral, procesos clave en la progresión del cáncer. 
+
+En **MSS**, las funciones moleculares asociadas incluyeron la **actividad enzimática oxidativa** y la **regulación del ciclo celular**, destacando su relación con procesos metabólicos y de reparación del ADN. Estos hallazgos sugieren que MSS tiene un perfil menos agresivo, enfocado en la estabilidad celular y la homeostasis.
+
+**Métodos empleados:**
+
+1. **ReactomePA y GO (Gene Ontology):** Utilizados para mapear las funciones moleculares específicas de los fosfopéptidos.
+
+2. **UniProt y BioMart:** Proporcionaron descripciones funcionales detalladas de las proteínas asociadas a los fosfopéptidos.
+
+3. **Visualizaciones:** Los Dot Plots y Enrichment Maps facilitaron la interpretación visual de las funciones moleculares enriquecidas en cada subtipo.
+
+
+
+#### **6.3 ¿Qué herramientas o bases de datos se utilizaron para asignar significado funcional y contextual a los fosfopéptidos diferencialmente abundantes?**
+
+Se emplearon diversas herramientas y bases de datos para asignar contexto funcional y biológico a los fosfopéptidos diferencialmente abundantes entre MSS y PD. Entre las principales destacan:
+
+1. **ClusterProfiler y ReactomePA**: Estas herramientas permitieron realizar análisis de enriquecimiento funcional, identificando procesos biológicos, funciones moleculares y rutas de señalización enriquecidas.
+
+2. **GO (Gene Ontology), KEGG y Reactome**: Bases de datos utilizadas para mapear los fosfopéptidos a términos biológicos específicos y rutas metabólicas relevantes, como MAPK/ERK y PI3K/AKT.
+
+3. **UniProt y BioMart**: Ayudaron a anotar los genes asociados con los fosfopéptidos, proporcionando detalles sobre su funcionalidad y localización subcelular.
+
+4. **PubMed y Human Protein Atlas**: Se utilizaron para validar la relevancia clínica de los fosfopéptidos seleccionados, verificando su expresión en tejidos tumorales y su conexión con otros estudios de cáncer.
+
+5. **STRINGdb**: Facilitó el análisis de interacción proteína-proteína (PPI), identificando redes moleculares clave asociadas a los fosfopéptidos y destacando proteínas centrales involucradas en procesos críticos.
+
+**Cómo se abordó:**
+Los resultados de los análisis de enriquecimiento funcional y las anotaciones de proteínas se representaron gráficamente mediante **Dot Plots**, **Enrichment Maps**, y **Network Plots**, que facilitaron la interpretación visual de los términos y redes funcionales más relevantes.
+
+
+##### **6.4 ¿Podrían estos fosfopéptidos diferencialmente abundantes servir como biomarcadores o proporcionar información sobre los mecanismos implicados en la progresión del cáncer?**
+
+Sí, los fosfopéptidos diferencialmente abundantes identificados tienen un alto potencial como biomarcadores y para proporcionar información clave sobre los mecanismos implicados en la progresión del cáncer. En **PD**, los fosfopéptidos relacionados con rutas como **MAPK/ERK** y **PI3K/AKT** reflejan la agresividad del subtipo y podrían actuar como indicadores de progresión tumoral y dianas terapéuticas. Por otro lado, en **MSS**, los fosfopéptidos asociados a procesos metabólicos y regulación del ciclo celular pueden ser útiles para estratificar pacientes con un perfil menos agresivo, facilitando la personalización del tratamiento.
+
+Además, se realizó un análisis de **interacción proteína-proteína (PPI)** utilizando herramientas como **STRINGdb**, que permitió identificar redes moleculares clave asociadas a los fosfopéptidos diferencialmente abundantes. Estas redes destacaron proteínas centrales (hub proteins) involucradas en procesos tumorales críticos, proporcionando un marco adicional para explorar la funcionalidad biológica de los fosfopéptidos seleccionados.
+
+Para reforzar la validez clínica de los resultados, se exploraron bases de datos como **Human Protein Atlas** y literatura en **PubMed**, confirmando la expresión de varias de las proteínas relacionadas con los fosfopéptidos en tipos de cáncer específicos. Estas validaciones respaldan la relevancia biológica y clínica de los biomarcadores identificados, posicionándolos como candidatos prometedores para aplicaciones diagnósticas y terapéuticas.
+
+##### **6.5 ¿Cuáles son las limitaciones del análisis de enriquecimiento funcional para interpretar diferencias en la fosforilación en el contexto del cáncer, y cómo pueden influir en la interpretación de los resultados?**
+
+El análisis de enriquecimiento funcional es una herramienta valiosa para interpretar datos de fosforilación en el contexto del cáncer; sin embargo, presenta varias limitaciones que pueden influir en la interpretación de los resultados:
+
+1. **Dependencia de bases de datos y anotaciones incompletas**: Las herramientas como GO, KEGG y Reactome dependen de la calidad y actualización de sus bases de datos. La falta de anotaciones completas o específicas para ciertos fosfopéptidos puede llevar a omitir rutas relevantes o a sesgos hacia procesos y vías mejor estudiados. 
+
+2. **Asignación estática de términos biológicos**: Los métodos de enriquecimiento funcional suelen asignar términos biológicos de manera estática, sin considerar la dinámica del microambiente tumoral ni las interacciones complejas entre proteínas en un sistema vivo. Esto limita la capacidad para interpretar adecuadamente el impacto biológico de los fosfopéptidos diferencialmente abundantes.
+
+3. **Sesgo técnico en la detección de fosfopéptidos**: Los métodos de enriquecimiento de fosfopéptidos, como TiO₂ y α-pTyr, pueden favorecer la detección de fosfopéptidos más abundantes o aquellos asociados a sitios de fosforilación mejor caracterizados. Esto restringe la cobertura global de las modificaciones de fosforilación y podría excluir fosfopéptidos relevantes en subtipos menos estudiados. 
+
+4. **Validación experimental limitada**: Aunque los análisis in silico identifican rutas y procesos potencialmente relevantes, es esencial complementar estos hallazgos con estudios funcionales adicionales para confirmar su impacto en la progresión del cáncer y su potencial utilidad clínica.
+
+5. **Tamaño de muestra reducido**: El reducido tamaño muestral de la mayoría de los experimentos y su acotación a un escenario específico suponen factores limitantes en la evaluación de este tipo de estudios. 
+
+6. **Selección de puntos de corte arbitrarios**: La elección de un punto de corte a partir del cual se selecciona un grupo de genes con diferencia de expresión puede introducir sesgos en el análisis de enriquecimiento funcional. 
+
+Estas limitaciones subrayan la importancia de interpretar los resultados con precaución, considerando los posibles sesgos y la necesidad de validación experimental para garantizar que las conclusiones reflejen la biología real del sistema tumoral. 
+
+---
+
+
+**Estrategia:**
+
+Para responder a las cuestiones planteadas, diseñamos una estrategia de análisis funcional basada en metodologías ampliamente usadas en estudios de fosfoproteómica y biomarcadores. Nuestro objetivo es identificar procesos biológicos, funciones moleculares y rutas de señalización asociadas a los fosfopéptidos diferencialmente abundantes en los subtipos tumorales MSS y PD, y explorar su potencial como biomarcadores.
+
+1. **Preparación de listas de fosfopéptidos**:
+
+   - Comenzamos filtrando los fosfopéptidos diferencialmente abundantes en función del log Fold Change y el p-valor ajustado, obtenidos de los resultados del análisis estadístico. Esto nos permite generar dos listas: una para fosfopéptidos más abundantes en el grupo PD y otra en el grupo MSS.
+   
+   - **Herramientas**: Usamos los resultados procesados en `limma` y almacenamos estas listas en el contenedor `SummarizedExperiment` para asegurar la integridad de los datos y facilitar su manipulación posterior.
+
+2. **Anotación funcional y mapeo de fosfopéptidos**:
+
+   - *Objetivo*: Antes del análisis de enriquecimiento, buscamos comprender las funciones de cada fosfopéptido. Utilizamos anotaciones detalladas para contextualizar su papel biológico.
+
+   - A través de **UniProt**, obtenemos nombres de genes, nombres de proteínas y descripciones funcionales, lo que proporciona un contexto inicial.
+
+   - Complementamos esta información con **BioMart (Ensembl)**, añadiendo datos sobre localización subcelular, funciones moleculares y procesos biológicos asociados a las proteínas identificadas.
+
+3. **Análisis de enriquecimiento funcional en bases de datos**:
+
+   - Exploramos términos enriquecidos en bases de datos clave para identificar procesos biológicos, funciones moleculares y rutas de señalización en cada grupo de fosfopéptidos.
+
+   - **Gene Ontology (GO)**: Analizamos los términos de **Procesos Biológicos (BP)**, **Funciones Moleculares (MF)** y **Componentes Celulares (CC)** para obtener una visión detallada de los roles funcionales.
+
+   - **KEGG**: Exploramos rutas de señalización, especialmente aquellas vinculadas con el cáncer y otros procesos relevantes.
+
+   - **Reactome**: Investigamos rutas detalladas de señalización en el contexto de cáncer y fosforilación.
+
+   - **Herramientas**: Utilizamos `ClusterProfiler`, `ReactomePA`, y consideramos **DAVID** o **Metascape** como alternativas para integrar varias bases de datos en el análisis de enriquecimiento.
+
+4. **Análisis de redes de interacción**:
+
+   - *Objetivo*: Visualizar y comprender las **interacciones funcionales directas** entre los fosfopéptidos identificados, explorando redes de señalización que podrían estar activas en cada subtipo tumoral. Este análisis profundiza en la **organización estructural y funcional** de los fosfopéptidos, más allá de la identificación de procesos y rutas enriquecidas.
+
+   - A diferencia del análisis de enriquecimiento (punto 3), que proporciona una visión general sobre **qué funciones y procesos** están asociados con los fosfopéptidos en cada grupo, este análisis se centra en **cómo** los fosfopéptidos **interactúan entre sí**. Aquí identificamos redes de interacción proteína-proteína (PPI) que revelan posibles **complejos funcionales** o **módulos** dentro de la red, proporcionando una perspectiva detallada sobre la **arquitectura de señalización y regulación** entre fosfopéptidos en los subtipos PD y MSS.
+
+   - **Metodología**: Utilizamos `STRINGdb` para identificar redes de interacción PPI relevantes, y visualizamos estas redes con `igraph` y `ggraph`. También empleamos métodos de detección de comunidades para identificar grupos o módulos altamente conectados, que pueden representar complejos funcionales o estructuras de señalización. 
+
+   - **Interpretación**: Los módulos o comunidades dentro de la red pueden estar relacionados con funciones o rutas específicas, y para interpretarlos realizamos un análisis de enriquecimiento funcional de estos subgrupos específicos. Esto permite observar patrones de interacción que podrían indicar redes de señalización activas, así como **potenciales puntos de intervención** o **biomarcadores**, en función de la conectividad de cada fosfopéptido dentro de la red.
+
+
+5. **Validación de biomarcadores en bases de datos clínicas**:
+
+   - *Objetivo*: Confirmar el potencial de los fosfopéptidos como biomarcadores que diferencien entre MSS y PD.
+
+   - Utilizamos **Human Protein Atlas** para investigar los patrones de expresión de las proteínas en tejidos humanos y en el contexto de diferentes tipos de cáncer.
+
+   - Realizamos búsquedas en **PubMed** para validar la relevancia de estos fosfopéptidos en estudios relacionados, evaluando su implicación en procesos similares.
+
+6. **Interpretación de resultados**:
+
+   - Con los datos obtenidos, comparamos los términos y rutas enriquecidas entre los grupos MSS y PD. Evaluamos las funciones y mecanismos moleculares predominantes en cada grupo y exploramos cómo estos pueden reflejar la progresión tumoral y las características biológicas de cada subtipo.
+
+---
+
+
+##### **Paso 1: Preparación de las Listas de Fosfopéptidos Diferencialmente Abundantes**
+
+Para realizar el análisis de enriquecimiento, primero necesitamos obtener listas de fosfopéptidos que muestran una abundancia diferencial significativa entre los subtipos tumorales. Estas listas se generarán a partir de los resultados estadísticos obtenidos en el análisis con **limma** y **arrayWeights**.
+
+
+1. **Filtramos los Fosfopéptidos con Significancia Estadística**  
+
+   - Seleccionamos aquellos fosfopéptidos que presenten un **p-valor ajustado menor a 0.05** para asegurar que los cambios observados son estadísticamente significativos.
+   
+
+2. **Aplicamos el Umbral de Fold Change**  
+
+   - Para destacar fosfopéptidos con cambios relevantes en abundancia, seleccionamos los que tengan un **log Fold Change (logFC) mayor a 1 o menor a -1**. Esto asegura que los fosfopéptidos seleccionados tengan al menos un cambio de dos veces en la abundancia entre los grupos.
+
+
+3. **Dividimos en Grupos**  
+
+   - Generamos dos listas separadas y almacenamos los resultados en el contenedor `SummarizedExperiment`:
+   
+     - **Fosfopéptidos más abundantes en PD**: logFC > 1.
+     
+     - **Fosfopéptidos más abundantes en MSS**: logFC < -1.
+     
+
+```{r message = FALSE, warning = FALSE, echo=FALSE}
+
+# Cargamos los resultados del análisis con limma
+
+# Filtramos los fosfopéptidos significativos con p-valor ajustado < 0.05 y log Fold Change >= |1|
+significant_peptides <- results[results$adj.P.Val < 0.05 & abs(results$logFC) >= 1, ]
+
+# Creamos la lista de fosfopéptidos más abundantes en PD (logFC > 1)
+pd_peptides <- significant_peptides[significant_peptides$logFC > 1, ]
+
+# Creamos la lista de fosfopéptidos más abundantes en MSS (logFC < -1)
+mss_peptides <- significant_peptides[significant_peptides$logFC < -1, ]
+
+# Verificamos el contenido de las listas
+head(pd_peptides)
+head(mss_peptides)
+
+# Guardamos las listas fuera del objeto `se`
+# Esta línea agrega las listas de fosfopéptidos "pd_peptides" y "mss_peptides"
+# en el metadato del objeto SummarizedExperiment (`se`), en lugar de intentar
+# añadirlas como ensayos, lo cual genera errores de dimensión.
+# Los metadatos son un buen lugar para almacenar información adicional
+# que no necesita tener el mismo número de filas o columnas que los datos principales.
+
+se@metadata$pd_peptides <- pd_peptides  # Almacena la lista de fosfopéptidos abundantes en PD.
+se@metadata$mss_peptides <- mss_peptides  # Almacena la lista de fosfopéptidos abundantes en MSS.
+
+# Verificamos que las listas se hayan agregado al contenedor
+# Aquí usamos `str()` para inspeccionar la estructura del objeto `se@metadata`
+# y asegurarnos de que las listas `pd_peptides` y `mss_peptides` se hayan almacenado correctamente.
+str(se@metadata)
+
+```
+
+**Interpretación de los resultados**
+
+- **pd_peptides**: Lista de fosfopéptidos con mayor abundancia en el grupo PD, que usaremos para identificar procesos y rutas enriquecidas en este grupo.
+
+- **mss_peptides**: Lista de fosfopéptidos con mayor abundancia en el grupo MSS, para analizar funciones y rutas específicas en MSS.
+
+---
+
+##### **Paso 2: Análisis Funcional y Mapeo de Fosfopéptidos**
+
+En este paso, asignaremos información funcional a los fosfopéptidos seleccionados para obtener una descripción detallada de cada uno antes de llevar a cabo el análisis de enriquecimiento. Esto incluye obtener los nombres de genes, descripciones funcionales, y otra información relevante asociada a cada fosfopéptido.
+
+La anotación funcional permite contextualizar los fosfopéptidos dentro de procesos biológicos conocidos y facilita la interpretación biológica en los análisis de enriquecimiento posteriores.
+
+Para llevar a cabo esta anotación, utilizaremos dos herramientas principales:
+  
+1. **UniProt**: Proporciona una base de datos exhaustiva sobre proteínas, incluyendo nombres de genes, descripciones funcionales y asociaciones con procesos biológicos y funciones moleculares.
+  
+2. **BioMart (Ensembl)**: Permite obtener información sobre la localización subcelular, funciones moleculares y procesos biológicos. BioMart también es muy útil para transformar identificadores de proteínas a otros formatos si es necesario.
+
+**Pasos a Seguir**
+
+1. Convertir los IDs de los fosfopéptidos a nombres de genes y obtener descripciones funcionales.
+
+2. Obtener información sobre procesos biológicos, funciones moleculares, y localización subcelular.
+
+##### **Paso 2.1: Anotación con UniProt**
+
+Para realizar una conexión confiable con UniProt y extraer anotaciones específicas, podemos usar un método basado en la API REST de UniProt. La ventaja de este enfoque es que permite una consulta directa a UniProt sin depender de paquetes como `UniProt.ws`, que pueden tener limitaciones o problemas de compatibilidad. Utilizaremos `httr` y `jsonlite`, dos paquetes en R que permiten hacer solicitudes a la API y procesar las respuestas de manera eficiente.
+
+Dado que tenemos listas de péptidos diferenciados en PD y MSS, el código se ajustará para aceptar `UniProt IDs` y devolver una lista con las anotaciones de interés. 
+
+```{r message = FALSE, warning = FALSE, echo=FALSE}
+
+# Cargamos las bibliotecas necesarias
+library(httr)        # Paquete para realizar solicitudes HTTP
+library(jsonlite)    # Paquete para manejar datos JSON
+
+# Extraemos los IDS de Uniprot directamente de `se`
+pd_ids <- rownames(se@metadata$pd_peptides) # Extraemos los IDs de UniProt para fosfopéptidos más abundantes en PD
+mss_ids <- rownames(se@metadata$mss_peptides)  # Extraemos lo IDs de UniProt para fosfopéptidos más abundantes en MSS
+
+# Creamos una función para realizar la solicitud a la API de UniProt para múltiples IDs
+fetch_uniprot_annotations <- function(ids) {  
+  annotations <- list()  # Inicializamos la lista para almacenar resultados
+  
+  for (id in ids) {  
+    # Construimos la URL de la API para cada ID de UniProt
+    url <- paste0("https://rest.uniprot.org/uniprotkb/", id, ".json")  
+    response <- GET(url)  # Realizar la solicitud HTTP a la API de UniProt
+    
+    # Verificamos que la solicitud fue exitosa (código 200)
+    if (status_code(response) == 200) {  
+      # Parseamos el contenido de la respuesta como JSON y simplificamos a data.frame
+      content_data <- content(response, as = "parsed", simplifyDataFrame = TRUE)  
+      annotations[[id]] <- content_data  # Guardamos el contenido en la lista de resultados
+    } else {
+      annotations[[id]] <- NA  # Si la solicitud falla, almacenamos NA
+      message("Error en la solicitud para ID: ", id)  # Imprimimos el mensaje de error
+    }
+  }
+  
+  return(annotations)  # Retornamos la lista con anotaciones
+}
+
+# Obtenemos las anotaciones para los IDs en pd_ids y mss_ids
+pd_annotations <- fetch_uniprot_annotations(pd_ids)  # Llamar a la función para IDs de PD
+mss_annotations <- fetch_uniprot_annotations(mss_ids)  # Llamar a la función para IDs de MSS
+
+# Mostramos algunos resultados de prueba
+print(pd_annotations[[1]])  # Imprimimos la anotación de un ID de pd_peptides
+print(mss_annotations[[1]])  # Imprimimos la anotación de un ID de mss_peptides
+
+save(se, file = "SummarizedExperiment.Rda")
+
+```
+
+**Interpretación de los resultados**
+
+**PD:**
+
+- Las proteínas de PD presentan características que favorecen una alta adaptabilidad y proliferación, con dominios que facilitan la activación rápida en respuesta a condiciones de estrés.
+
+- Predomina la presencia de múltiples isoformas, lo que les permite una mayor flexibilidad funcional y capacidad de respuesta a estímulos variados, favoreciendo la proliferación y la agresividad tumoral.
+
+- Las proteínas de PD están asociadas a rutas de proliferación celular, señalización de estrés y reparación celular, con conexiones en bases de datos como KEGG y Reactome en contextos de cáncer.
+
+- Las modificaciones postraduccionales, especialmente la fosforilación, activan continuamente rutas proliferativas, contribuyendo a un perfil tumoral agresivo y adaptable.
+
+**MSS:**
+
+- Las proteínas de MSS muestran dominios transmembrana y características estructurales que facilitan la señalización en la membrana, indicando un rol más estable en la comunicación celular con el entorno.
+
+- La menor variabilidad de isoformas en MSS sugiere una función más estable y específica, enfocada en la homeostasis y sin énfasis en adaptaciones rápidas.
+
+- Las proteínas de MSS están vinculadas a rutas de señalización celular y diferenciación, que reflejan un perfil funcional menos proliferativo y más orientado a la estabilidad.
+
+- La fosforilación en proteínas de MSS se asocia con la regulación de funciones estables y la preservación de la estructura celular, contribuyendo a un perfil tumoral menos agresivo y más homeostático.
+
+
+##### **Paso 2.2: Anotación Adicional con BioMart**
+
+```{r message = FALSE, warning = FALSE, echo=FALSE}
+
+# Cargamos biomaRt
+library(biomaRt)  # Paquete para acceder a BioMart y realizar consultas en Ensembl
+
+# Configuramos mart para acceder a Ensembl y obtener información relacionada con UniProt
+ensembl <- useMart("ensembl", dataset = "hsapiens_gene_ensembl")  
+# Especificamos el "mart" de Ensembl para genes humanos
+
+# Extraemos información para pd_peptides
+pd_annotations <- getBM(
+  attributes = c("uniprotswissprot", "hgnc_symbol", "description"),  # Definimos los atributos a obtener: ID de UniProt, símbolo HGNC, y descripción
+  filters = "uniprotswissprot",  # Filtramos por IDs de UniProt
+  values = pd_ids,  # Utilizamos los IDs de PD
+  mart = ensembl  # Especificamos el objeto mart de Ensembl
+)
+
+# Extraemos la información para mss_peptides
+mss_annotations <- getBM(
+  attributes = c("uniprotswissprot", "hgnc_symbol", "description"),  # Mismos atributos que para PD
+  filters = "uniprotswissprot",  # Filtramos por IDs de UniProt
+  values = mss_ids,  # Utilizamos los IDs de MSS
+  mart = ensembl  # Especificamos el objeto mart de Ensembl
+)
+
+# Visualizamos las anotaciones para cada grupo
+pd_annotations  # Mostramos los resultados de anotaciones para el grupo PD
+mss_annotations  # Mostramos los resultados de anotaciones para el grupo MSS
+
+
+```
+
+
+**Interpretación de los resultados**
+
+Los resultados obtenidos en BioMart ofrecen anotaciones esenciales para los fosfopéptidos diferencialmente abundantes en los subtipos PD y MSS, proporcionando información clave sobre el rol de estas proteínas en procesos biológicos específicos.
+
+1. **Grupo PD**:
+   - Las proteínas diferencialmente abundantes en PD, como **BRD4** (un regulador de la transcripción) y **MAPK14** (una proteína quinasa implicada en la respuesta al estrés), están relacionadas con la regulación de la transcripción y la activación de rutas de supervivencia y proliferación celular. Estas proteínas están típicamente vinculadas a respuestas celulares que promueven la adaptación a entornos agresivos o desfavorables.
+   
+   - La abundancia de fosfopéptidos que regulan rutas de señalización de supervivencia y proliferación en PD sugiere un perfil tumoral más agresivo, con mecanismos que favorecen el crecimiento celular descontrolado y la resistencia a factores de estrés. Esta predominancia en vías de señalización asociadas a la activación y proliferación celular puede reflejar un comportamiento biológico que facilita la progresión tumoral y la evasión de respuestas apoptóticas.
+
+2. **Grupo MSS**:
+
+   - En contraste, las proteínas diferencialmente abundantes en MSS, como **EPS8** (involucrada en la transducción de señales en la membrana celular) y **NUCKS1** (asociada a la regulación de la transcripción y funciones de respuesta al daño del ADN), están relacionadas con la señalización en la membrana y la homeostasis celular.
+   
+   - En MSS, la fosforilación parece estar modulando funciones que mantienen la estabilidad celular y responden a señales externas sin inducir necesariamente proliferación agresiva. Esto sugiere un perfil menos proliferativo y más orientado a la homeostasis y la diferenciación, indicando que MSS podría representar un subtipo tumoral menos agresivo y con una mayor estabilidad en comparación con PD.
+
+
+Estos hallazgos resaltan diferencias clave en los mecanismos de señalización entre PD y MSS. En PD, la fosforilación potencia vías que favorecen la proliferación celular y la adaptación a entornos de alto estrés, características típicas de tumores más agresivos. Por otro lado, en MSS, los fosfopéptidos están más orientados a la regulación de señales de membrana y funciones de estabilidad celular, reflejando una biología menos agresiva y más orientada a la homeostasis.
+
+---
+
+##### **Paso 3: Análisis de Enriquecimiento Funcional en Bases de Datos**
+
+Para entender el papel biológico y funcional de los fosfopéptidos diferencialmente abundantes en los subtipos tumorales PD y MSS, realizamos un análisis de enriquecimiento funcional en distintas bases de datos. Para ello, utilizaremos los UniProt IDs de los fosfopéptidos diferencialmente abundantes en PD y MSS, almacenados en el objeto SummarizedExperiment (se).
+
+
+1. **Análisis de Enriquecimiento Funcional con ClusterProfiler** 
+
+   - Utilizamos `ClusterProfiler` para realizar un análisis de enriquecimiento en **Gene Ontology (GO)** y **KEGG**.
+   
+   - Realizamos análisis específicos para cada aspecto de GO: **Procesos Biológicos (BP)**, **Funciones Moleculares (MF)**, y **Componentes Celulares (CC)**, y analizamos rutas de señalización en KEGG.
+
+2. **Análisis de Rutas con ReactomePA**  
+
+   - Usamos `ReactomePA` para analizar rutas detalladas en el contexto de señalización y cáncer, con un enfoque en fosforilación.
+
+   
+**Visualización de los Resultados de Enriquecimiento**
+
+Para interpretar eficazmente los resultados del análisis de enriquecimiento, utilizamos tres tipos de gráficos: el **Dot Plot**, el **Enrichment Map**, y el **Network Plot**.
+
+- **Dot Plot**: muestra los términos enriquecidos en función de la proporción de genes (GeneRatio) y el valor ajustado de p (p.adjust). La intensidad del color refleja la significancia estadística, mientras que el tamaño de los puntos indica la cantidad de genes implicados. En nuestro análisis, los Dot Plots para PD y MSS permitirán identificar rápidamente los términos más representativos y su nivel de enriquecimiento en cada subtipo tumoral.
+
+- **Enrichment Map**: permite visualizar relaciones y agrupaciones entre términos enriquecidos. Los términos se conectan si están relacionados semánticamente, formando clusters que indican temas funcionales comunes. En el contexto de PD y MSS, este gráfico facilita la identificación de grupos funcionales específicos en los fosfopéptidos diferencialmente abundantes de cada subtipo, lo que ayuda a comprender los mecanismos biológicos que predominan en cada uno.
+
+- **Network Plot**: resalta la interacción entre los términos enriquecidos y los genes individuales. Cada término se conecta con los genes que lo componen, proporcionando una visión detallada de cómo los fosfopéptidos se relacionan con rutas o procesos específicos. En este caso, esperamos ver cómo diferentes rutas (o términos de GO) se relacionan con los genes de PD y MSS, ilustrando su papel en el perfil funcional de cada subtipo.
+
+---
+
+##### **Paso 3.1.1: Enriquecimiento en GO (Gene Ontology)**
+
+Para explorar las funciones biológicas y moleculares de los fosfopéptidos diferencialmente abundantes en MSS y PD, realizamos un análisis de enriquecimiento en términos de GO utilizando la herramienta `clusterProfiler`. Este análisis se enfoca en tres categorías clave de la Ontología de Genes:
+
+- **Biological Process (BP)**: Procesos biológicos generales, como proliferación o apoptosis, que pueden diferenciar estos subtipos.
+
+- **Molecular Function (MF)**: Funciones moleculares específicas, como actividad enzimática, que reflejan la acción directa de los fosfopéptidos.
+
+- **Cellular Component (CC)**: Localización subcelular, proporcionando contexto sobre dónde ocurren estos eventos de fosforilación.
+
+
+```{r message = FALSE, warning = FALSE, echo=FALSE}
+
+# Realizamos el análisis de enriquecimiento GO para el grupo PD
+go_pd <- enrichGO(
+  gene = pd_ids,                # IDs de genes/fosfopéptidos más abundantes en PD
+  OrgDb = org.Hs.eg.db,         # Base de datos de anotaciones para genes humanos
+  keyType = "UNIPROT",          # Tipo de clave para los IDs utilizados
+  ont = "ALL",                  # Categoría GO: BP, MF y CC
+  pAdjustMethod = "BH",         # Método de ajuste de p-valor (Benjamini-Hochberg)
+  pvalueCutoff = 0.05,          # Umbral de significancia para p-valor
+)
+
+# Mostramos los resultados de GO para PD
+head(go_pd)
+
+# Realizamos el análisis de enriquecimiento GO para el grupo MSS
+go_mss <- enrichGO(
+  gene = mss_ids,               # IDs de genes/fosfopéptidos más abundantes en MSS
+  OrgDb = org.Hs.eg.db,         # Base de datos de anotaciones para genes humanos
+  keyType = "UNIPROT",          # Tipo de clave para los IDs utilizados
+  ont = "ALL",                  # Categoría GO: BP, MF y CC
+  pAdjustMethod = "BH",         # Método de ajuste de p-valor (Benjamini-Hochberg)
+  pvalueCutoff = 0.05,          # Umbral de significancia para p-valor
+)
+
+# Mostramos resultados de GO para MSS
+head(go_mss)
+
+# Visualizamos los resultados de enriquecimiento de manera clara y visual utilizando distintos gráficos:
+
+# Dot plot para términos GO en el grupo PD
+dotplot(go_pd, showCategory = 10, title = "Top 10 Términos GO para PD") +
+  theme_minimal()
+
+# Dot plot para términos GO en el grupo MSS
+dotplot(go_mss, showCategory = 10, title = "Top 10 Términos GO para MSS") +
+  theme_minimal()
+
+# Enrichment Map para el grupo PD
+emapplot(pairwise_termsim(go_pd), showCategory = 10, title = "Mapa de Enriquecimiento GO para PD")
+
+# Enrichment Map para el grupo MSS
+emapplot(pairwise_termsim(go_mss), showCategory = 10, title = "Mapa de Enriquecimiento GO para MSS")
+
+
+# Network plot para el grupo PD
+cnetplot(go_pd, showCategory = 10, foldChange = pd_ids, title = "Diagrama de Red GO para PD")
+
+# Network plot para el grupo MSS
+cnetplot(go_mss, showCategory = 10, foldChange = mss_ids, title = "Diagrama de Red GO para MSS")
+
+```
+**Interpretación de los resultados**
+
+**Grupo PD**
+
+1. **Procesos Biológicos (BP)**:
+
+   - Los términos de GO para el grupo PD incluyen procesos relacionados con la **regulación positiva de la migración de células estrelladas hepáticas** y la **unión de receptores de partículas de lipoproteínas de baja densidad (LDL)**.
+   
+   - Estos procesos indican un perfil en el cual se prioriza la proliferación y el movimiento celular, factores clave en la progresión y diseminación del cáncer.
+   
+   - La presencia de términos relacionados con la **proyección celular** sugiere que los fosfopéptidos en PD pueden estar involucrados en el crecimiento y la expansión celular.
+   
+
+2. **Funciones Moleculares (MF)**:
+
+   - En el aspecto molecular, los fosfopéptidos en PD se asocian con **funciones de unión a receptores específicos**, que son esenciales para la señalización y el crecimiento celular en contextos tumorales.
+   
+   - Estos términos sugieren una alta capacidad de las proteínas en PD para interactuar con señales externas y participar en rutas de señalización de supervivencia.
+   
+
+3. **Componentes Celulares (CC)**:
+
+   - Los fosfopéptidos en PD se encuentran asociados con **componentes de la membrana celular y estructuras de proyección**, destacando su potencial para intervenir en la comunicación entre células o con el microambiente.
+   
+   - Este perfil de localización refuerza la idea de un subtipo más agresivo, donde la comunicación célula-célula y la movilidad son relevantes.
+
+
+**Grupo MSS**
+
+1. **Procesos Biológicos (BP)**:
+
+   - En el caso de MSS, los términos de GO indican procesos como la **modulación de la función molecular por el hospedador viral** y **actividades catalíticas simbióticas**.
+   
+   - La modulación por el huésped y la regulación de la receptividad femenina resaltan la estabilidad del entorno celular y la respuesta a estímulos específicos.
+   
+   - Esto sugiere que los fosfopéptidos en MSS están más orientados a procesos de señalización de membrana y regulación homeostática, reflejando un comportamiento menos agresivo y más enfocado en la estabilidad celular.
+   
+
+2. **Funciones Moleculares (MF)**:
+
+   - En términos de función molecular, MSS muestra una menor diversidad en términos de unión y activación de receptores en comparación con PD.
+   
+   - Esto podría indicar un menor enfoque en la respuesta activa de señalización de crecimiento, alineándose con la idea de una regulación más controlada y menos orientada a la proliferación.
+   
+
+3. **Componentes Celulares (CC)**:
+
+   - Los fosfopéptidos en MSS se asocian con componentes celulares más estables y menos propensos a cambios en la proyección o migración.
+   
+   - La localización de estos fosfopéptidos en MSS sugiere que están más involucrados en la regulación de funciones intracelulares estables, promoviendo un entorno menos reactivo y más enfocado en el mantenimiento de la homeostasis.
+   
+
+**Conclusión**
+
+Las proteínas y fosfopéptidos más abundantes en PD están orientados a facilitar la **proliferación celular, la migración y la respuesta activa a señales externas**. Esto respalda un perfil tumoral más agresivo, con capacidad de adaptación y diseminación. Mientras que los fosfopéptidos en MSS se orientan a un perfil **homeostático y de señalización estable**, con menor foco en la proliferación agresiva y mayor inclinación hacia la regulación intracelular y la estabilidad.
+
+Estas diferencias resaltan cómo los fosfopéptidos en PD y MSS se asocian a rutas funcionales y biológicas distintas, reflejando diferencias en los mecanismos subyacentes de estos subtipos tumorales.
+
+---
+
+##### **Paso 3.1.2: Análisis de Enriquecimiento en Rutas de Señalización (KEGG - Kyoto Encyclopedia of Genes and Genomes)**
+
+Para identificar rutas de señalización críticas, especialmente relacionadas con el cáncer y el crecimiento celular, utilizamos la base de datos KEGG. KEGG permite el análisis de rutas específicas, como aquellas vinculadas a la fosforilación y activación de proteínas, brindando una perspectiva sobre cómo se modulan estas vías en los subtipos MSS y PD. Este análisis es fundamental para identificar rutas que puedan estar alteradas en el contexto tumoral.
+
+
+```{r message = FALSE, warning = FALSE, echo=FALSE}
+
+# Realizamos el análisis de enriquecimiento KEGG para el grupo PD
+kegg_pd <- enrichKEGG(
+  gene = pd_ids,                # IDs de genes/fosfopéptidos más abundantes en PD
+  organism = "hsa",             # Especifica que se usa el organismo humano (Homo sapiens)
+  keyType = "uniprot",          # Tipo de clave para los IDs utilizados (UniProt)
+  pAdjustMethod = "BH",         # Método de ajuste de p-valor (Benjamini-Hochberg)
+  pvalueCutoff = 0.1            # Umbral de significancia para p-valor (aumentado a 0.1 para obtener más rutas)
+)
+
+# Mostramos los primeros resultados de enriquecimiento KEGG para PD
+head(kegg_pd)
+
+# Realizamos el análisis de enriquecimiento KEGG para el grupo MSS
+kegg_mss <- enrichKEGG(
+  gene = mss_ids,               # IDs de genes/fosfopéptidos más abundantes en MSS
+  organism = "hsa",             # Especifica que se usa el organismo humano (Homo sapiens)
+  keyType = "uniprot",          # Tipo de clave para los IDs utilizados (UniProt)
+  pAdjustMethod = "BH",         # Método de ajuste de p-valor (Benjamini-Hochberg)
+  pvalueCutoff = 0.1            # Umbral de significancia para p-valor (ajustado para permitir más rutas significativas)
+)
+
+# Mostramos los primeros resultados de enriquecimiento KEGG para MSS
+head(kegg_mss)
+
+
+#Visualización de los resultados
+
+# Creamos un gráfico de puntos (dot plot) para los términos KEGG en el grupo MSS
+dotplot(kegg_mss, showCategory = 10, title = "Top 10 Términos KEGG para MSS") + 
+  theme_minimal()               # Aplica un tema minimalista al gráfico para mejorar la visualización
+
+# Creamos un gráfico de puntos (dot plot) para los términos KEGG en el grupo PD
+dotplot(kegg_pd, showCategory = 10, title = "Top 10 Términos KEGG para PD") + 
+  theme_minimal()               # Aplica un tema minimalista al gráfico
+
+# Creamos un mapa de enriquecimiento (enrichment map) para los términos KEGG en el grupo MSS
+emapplot(pairwise_termsim(kegg_mss), showCategory = 10, title = "Mapa de Enriquecimiento KEGG para MSS")
+
+# Creamos un mapa de enriquecimiento (enrichment map) para los términos KEGG en el grupo PD
+emapplot(pairwise_termsim(kegg_pd), showCategory = 10, title = "Mapa de Enriquecimiento KEGG para PD")
+
+# Creamos un diagrama de red (network plot) para los términos KEGG en el grupo MSS
+cnetplot(kegg_mss, showCategory = 10, foldChange = mss_ids, title = "Diagrama de Red KEGG para MSS")
+
+# Creamos un diagrama de red (network plot) para los términos KEGG en el grupo PD
+cnetplot(kegg_pd, showCategory = 10, foldChange = pd_ids, title = "Diagrama de Red KEGG para PD")
+
+```
+
+**Interpretación de los resultados**
+
+**Grupo PD**
+
+En el grupo PD, los fosfopéptidos más abundantes muestran una activación en rutas específicas relacionadas tanto con **infecciones bacterianas** como con **procesos inmunológicos** y de señalización.
+
+- **Salmonella Infection** y **Pertussis**: Estas rutas relacionadas con infecciones bacterianas sugieren que las proteínas fosforiladas en PD podrían estar involucradas en respuestas inmunológicas o en la activación de defensas celulares. Este patrón podría estar relacionado con un perfil tumoral que presenta mecanismos de respuesta ante estrés ambiental o agentes infecciosos.
+
+- **VEGF Signaling Pathway**: La vía de señalización del factor de crecimiento endotelial vascular (VEGF) es crítica para la **angiogénesis y el suministro de nutrientes al tumor**. Su presencia sugiere que PD podría estar impulsando el crecimiento y la proliferación tumoral mediante la formación de nuevos vasos sanguíneos.
+
+- **RIG-I-like Receptor Signaling Pathway**: Esta ruta, importante en la respuesta antiviral, apunta a una **activación de mecanismos de detección y respuesta al estrés celular**, típicamente vinculados a la defensa contra virus y células en peligro. En el contexto tumoral, podría indicar una actividad de señalización que favorece la resistencia.
+
+- **PD-L1 Expression and PD-1 Checkpoint Pathway in Cancer**: Esta ruta es clave en la evasión inmune por parte del tumor, lo que sugiere que PD podría aprovechar mecanismos de inhibición de la respuesta inmune para **evadir la detección por el sistema inmunológico**.
+
+En conjunto, estas rutas resaltan un perfil en PD caracterizado por una **proliferación activa, angiogénesis** y mecanismos de **evasión inmune**, lo cual podría favorecer un comportamiento más agresivo y resistente a terapias inmunes.
+
+**Grupo MSS**
+
+En el grupo MSS, las rutas de enriquecimiento están relacionadas principalmente con la señalización neuronal y la adicción a sustancias.
+
+- **Cocaine Addiction, Amphetamine Addiction, y Alcoholism**: Estas rutas están vinculadas a procesos de **señalización dopaminérgica y neuroadaptación**, lo que sugiere que MSS podría activar mecanismos de regulación neuronal o de respuesta al entorno mediante fosforilación en estas vías.
+
+- **Dopaminergic Synapse**: Esta ruta de señalización dopaminérgica, además de estar relacionada con procesos adictivos, está involucrada en la **modulación de la señalización celular** y podría reflejar un comportamiento de MSS orientado a una regulación celular estable.
+
+- **cAMP Signaling Pathway**: Esta ruta de señalización, implicada en la transmisión de señales celulares, podría sugerir que MSS mantiene un perfil homeostático, con capacidad de modular su respuesta a estímulos sin activar mecanismos proliferativos agresivos.
+
+Estas rutas en MSS parecen indicar un perfil menos agresivo, con **mecanismos de señalización orientados a la regulación celular** y una interacción más balanceada con el entorno.
+
+**Conclusión**
+
+La comparación entre los dos grupos muestra diferencias significativas en sus perfiles de señalización y adaptación:
+
+- **PD** está asociado a vías de crecimiento agresivo, angiogénesis y evasión inmune, indicando un perfil tumoral más **proliferativo y resistente** a los mecanismos de control inmunitario.
+
+- **MSS**, en cambio, parece activar rutas de señalización relacionadas con la **modulación neuronal y la estabilidad celular**, lo que sugiere un perfil tumoral menos agresivo y más enfocado en la **homeostasis y la regulación**.
+
+---
+
+##### **Paso 3.2: Análisis de Rutas en Reactome**
+
+Reactome proporciona un análisis detallado de vías de señalización y modificaciones postraduccionales. En nuestro caso, permite identificar cambios críticos en rutas de señalización y su relevancia en el desarrollo tumoral.
+
+```{r message = FALSE, warning = FALSE, echo=FALSE}
+
+library(DT)             # Para mostrar tablas interactivas
+
+# Paso 1: Conversión de UniProt IDs a ENTREZ IDs
+# Convertimos los ids de UniProt a ENTREZ para PD
+pd_entrez <- bitr(pd_ids, fromType = "UNIPROT", toType = "ENTREZID", OrgDb = org.Hs.eg.db)
+pd_entrez_ids <- pd_entrez$ENTREZID  # Extraemos sólo los ENTREZ IDs
+
+# Convertimos los ids de UniProt a ENTREZ para MSS
+mss_entrez <- bitr(mss_ids, fromType = "UNIPROT", toType = "ENTREZID", OrgDb = org.Hs.eg.db)
+mss_entrez_ids <- mss_entrez$ENTREZID  # Extraemos sólo los ENTREZ IDs
+
+# Comprobamos las conversiones
+cat("Conversiones de UniProt a ENTREZ para PD y MSS:\n")
+head(pd_entrez)
+head(mss_entrez)
+
+# Paso 2: Análisis de Enriquecimiento en Reactome
+# Análisis de enriquecimiento Reactome para el grupo PD
+reactome_pd <- enrichPathway(
+  gene = pd_entrez_ids,         # Usamos los ENTREZ IDs para PD
+  organism = "human",           # Especificamos el organismo como humano
+  pAdjustMethod = "BH",         # Método de ajuste de p-valor (Benjamini-Hochberg)
+  pvalueCutoff = 0.2            # Umbral de significancia para p-valor (0.1 para más rutas)
+)
+
+# Verificamos si reactome_pd tiene datos
+if (nrow(reactome_pd) > 0) {
+  # Mostramos los primeros resultados de Reactome para PD
+  datatable(head(reactome_pd))
+} else {
+  cat("No se encontraron rutas enriquecidas en Reactome para el grupo PD con los criterios actuales.\n")
+}
+
+# Realizamos el análisis de enriquecimiento Reactome para el grupo MSS
+reactome_mss <- enrichPathway(
+  gene = mss_entrez_ids,        # Usamos los ENTREZ IDs para MSS
+  organism = "human",           # Especificamos el organismo como humano
+  pAdjustMethod = "BH",         # Método de ajuste de p-valor (Benjamini-Hochberg)
+  pvalueCutoff = 0.2            # Umbral de significancia para p-valor (0.1 para más rutas)
+)
+
+# Verificamos si reactome_mss tiene datos
+if (nrow(reactome_mss) > 0) {
+  # Mostramos los primeros resultados de Reactome para MSS
+  datatable(head(reactome_mss))
+} else {
+  cat("No se encontraron rutas enriquecidas en Reactome para el grupo MSS con los criterios actuales.\n")
+}
+
+# Visualización de los resultados
+# Solo se procede a la visualización si los resultados no están vacíos
+
+# Dot plot para PD
+if (nrow(reactome_pd) > 0) {
+  dotplot(reactome_pd, showCategory = 10, title = "Top 10 Rutas Reactome enriquecidas en PD") + theme_minimal()
+} else {
+  cat("No se generó el Dot plot para PD ya que no hay datos.\n")
+}
+
+# Dot plot para MSS
+if (nrow(reactome_mss) > 0) {
+  dotplot(reactome_mss, showCategory = 10, title = "Top 10 Rutas Reactome enriquecidas en MSS") + theme_minimal()
+} else {
+  cat("No se generó el Dot plot para MSS ya que no hay datos.\n")
+}
+
+# Enrichment Map para PD
+if (nrow(reactome_pd) > 0) {
+  emapplot(pairwise_termsim(reactome_pd), showCategory = 10, title = "Mapa de Enriquecimiento Reactome para PD")
+} else {
+  cat("No se generó el Mapa de Enriquecimiento para PD ya que no hay datos.\n")
+}
+
+# Enrichment Map para MSS
+if (nrow(reactome_mss) > 0) {
+  emapplot(pairwise_termsim(reactome_mss), showCategory = 10, title = "Mapa de Enriquecimiento Reactome para MSS")
+} else {
+  cat("No se generó el Mapa de Enriquecimiento para MSS ya que no hay datos.\n")
+}
+
+# Network plot para PD
+if (nrow(reactome_pd) > 0) {
+  cnetplot(reactome_pd, foldChange = pd_ids, showCategory = 10, title = "Diagrama de Red Reactome para PD")
+} else {
+  cat("No se generó el Diagrama de Red para PD ya que no hay datos.\n")
+}
+
+# Network plot para MSS
+if (nrow(reactome_mss) > 0) {
+  cnetplot(reactome_mss, foldChange = mss_ids, showCategory = 10, title = "Diagrama de Red Reactome para MSS")
+} else {
+  cat("No se generó el Diagrama de Red para MSS ya que no hay datos.\n")
+}
+
+
+```
+
+**Interpretación de los resultados**
+
+1. **Grupo PD**:
+
+   - **Neutrophil Degranulation (Degranulación de Neutrófilos)**: Esta ruta sugiere una mayor implicación de procesos inflamatorios en PD, que podrían contribuir al microambiente tumoral y a la progresión del cáncer.
+   
+   - **Activation of PPARGC1A (PGC-1alpha) by Phosphorylation**: Esta vía está relacionada con la regulación metabólica y sugiere que en PD hay una activación de rutas de metabolismo energético.
+   
+   - **p38MAPK Events**: La señalización MAPK se asocia a procesos de crecimiento y respuesta al estrés, lo que sugiere una activación de mecanismos de señalización de crecimiento celular en PD.
+   
+   - **Fc epsilon RI Signaling Pathway (Señalización de Fc epsilon RI)**: Esta ruta indica una implicación en señalización inmunológica, posiblemente relacionada con respuestas inflamatorias o inmunes en el contexto tumoral de PD.
+   
+Los fosfopéptidos más abundantes en PD parecen estar vinculados a rutas de señalización inmunológica, inflamatoria y metabólica, sugiriendo un perfil que apoya la progresión tumoral y la proliferación celular.
+
+2. **Grupo MSS**:
+
+   - **DARPP-32 Events y Opioid Signalling**: Estas rutas de señalización neuronal y de transmisión de señales sugieren una actividad diferente en MSS, posiblemente relacionada con la regulación de rutas de señalización intracelular específicas en este subtipo.
+   
+   - **Sensory Processing in Cochlear Hair Cells**: Aunque menos relevante en el contexto tumoral, la presencia de estas rutas podría indicar diferencias en el perfil de señalización entre PD y MSS.
+   
+   - **G alpha (i) Signalling Events**: Esta vía de señalización está involucrada en la transmisión de señales a través de proteínas G, indicando potenciales diferencias en la señalización celular en MSS.
+   
+
+En el subtipo MSS, los fosfopéptidos están relacionados principalmente con rutas de señalización neuronal y procesos de transmisión de señales específicos, lo que sugiere un perfil de señalización distinto al de PD.
+
+
+**Conclusión**
+
+La diferencia clave entre los grupos PD y MSS radica en el tipo de rutas activadas:
+
+- **PD** muestra un enriquecimiento en rutas de inflamación, metabolismo y señalización inmune, apoyando un perfil de crecimiento y progresión tumoral.
+
+- **MSS** muestra enriquecimiento en rutas de señalización neuronal y de proteínas G, indicando un perfil de señalización diferente.
+
+
+---
+
+##### **Paso 4: Análisis de Redes de Interacción**
+
+El objetivo de este paso es identificar y analizar redes de interacción proteína-proteína (PPI) entre los fosfopéptidos más abundantes en los subtipos tumorales PD y MSS. Esto permite explorar las relaciones funcionales y la organización modular de las proteínas en cada grupo.
+
+**Pasos a seguir:**
+
+1. **Identificación de redes de interacción con STRINGdb**: Se recuperaron redes de interacción proteína-proteína desde STRINGdb para proteínas específicas de cada grupo.
+
+   - **Descripción**: `STRINGdb` es un paquete de R que permite la recuperación de redes de interacción proteína-proteína a partir de la base de datos STRING. Esto permite explorar cómo los fosfopéptidos identificados pueden estar conectados funcionalmente.
+   
+   - **Requerimientos**: Debemos asegurarnos de tener los IDs de proteína en un formato compatible con STRING (UniProt o ENTREZ).
+   
+2. **Visualización y Análisis de Redes en R con `igraph` o `ggraph`**:
+
+   - Se analizaron las propiedades de las redes y se identificaron módulos o comunidades funcionales mediante algoritmos de clustering.
+   
+
+3. **Priorización de Nodos Clave:**
+   
+   - Calculamos métricas de centralidad y grado para destacar proteínas clave en términos de conectividad e intermediación.
+
+```{r message = FALSE, warning = FALSE, echo=FALSE}
+
+# Cargamos las bibliotecas necesarias
+library(igraph)   # Biblioteca para crear y manipular grafos y redes complejas.
+library(ggraph)   # Biblioteca para la visualización de grafos utilizando `ggplot2`.
+
+# Inicializamos STRINGdb
+cat("Inicializando STRINGdb...\n")  # Imprimimos un mensaje indicando la inicialización.
+string_db <- STRINGdb$new(          # Creamos un nuevo objeto STRINGdb con los parámetros siguientes:
+  species = 9606,                   # ID taxonómico de NCBI para el humano.
+  score_threshold = 150,            # Umbral mínimo para la puntuación de interacción; reduce el número de interacciones débiles.
+  input_directory = ""              # Directorio de trabajo donde se almacenan datos relacionados con STRINGdb.
+)
+
+# Eliminamos sufijos de UniProt IDs
+normalize_uniprot_ids <- function(ids) {  # Creamos una función para normalizar UniProt IDs.
+  gsub("\\..*$", "", ids)  # Eliminamos cualquier sufijo después de un punto (e.g., "P12345.1" -> "P12345").
+}
+normalized_pd_ids <- normalize_uniprot_ids(pd_ids)  # Normalizamos los IDs de PD.
+normalized_mss_ids <- normalize_uniprot_ids(mss_ids)  # Normalizamos los IDs de MSS.
+
+# Mapeamos IDs de UniProt a STRING IDs
+cat("Mapeando IDs de UniProt a STRING para PD y MSS...\n")  # Imprimimos un mensaje indicando el mapeo.
+pd_df <- data.frame(UNIPROT = normalized_pd_ids, stringsAsFactors = FALSE)  # Creamos un dataframe con los IDs normalizados de PD.
+mss_df <- data.frame(UNIPROT = normalized_mss_ids, stringsAsFactors = FALSE)  # Creamos un dataframe con los IDs normalizados de MSS.
+
+# Mapeo para PD
+pd_mapped <- string_db$map(pd_df, "UNIPROT", removeUnmappedRows = FALSE)  # Mapeamos los IDs de UniProt de PD a STRING IDs.
+unmapped_pd <- pd_mapped[is.na(pd_mapped$STRING_id), ]  # Filtramos los IDs que no se pudieron mapear.
+cat("IDs no mapeados para PD:\n")  # Imprimimos un mensaje indicando los IDs no mapeados.
+print(unmapped_pd)  # Mostramos los IDs no mapeados.
+
+# Mapeo para MSS
+mss_mapped <- string_db$map(mss_df, "UNIPROT", removeUnmappedRows = FALSE)  # Mapeamos los IDs de UniProt de MSS a STRING IDs.
+unmapped_mss <- mss_mapped[is.na(mss_mapped$STRING_id), ]  # Filtramos los IDs que no se pudieron mapear.
+cat("IDs no mapeados para MSS:\n")  # Imprimimos un mensaje indicando los IDs no mapeados.
+print(unmapped_mss)  # Mostramos los IDs no mapeados.
+
+# Filtramos para obtener únicamente los mapeos válidos
+pd_mapped <- pd_mapped[!is.na(pd_mapped$STRING_id), ]  # Eliminamos los IDs no mapeados en PD.
+mss_mapped <- mss_mapped[!is.na(mss_mapped$STRING_id), ]  # Eliminamos los IDs no mapeados en MSS.
+
+# Obtenemos las interacciones
+cat("Obteniendo interacciones para PD y MSS...\n")  # Indicamos que se están obteniendo las interacciones.
+pd_interactions <- string_db$get_interactions(pd_mapped$STRING_id)  # Obtenemos las interacciones para los STRING IDs mapeados de PD.
+mss_interactions <- string_db$get_interactions(mss_mapped$STRING_id)  # Obtenemos las interacciones para los STRING IDs mapeados de MSS.
+
+# Filtramos las interacciones con un score_threshold menos estricto (>= 150)
+pd_interactions_filtered <- pd_interactions[pd_interactions$combined_score >= 150, ]  # Filtramos interacciones con una puntuación combinada >= 150 para PD.
+mss_interactions_filtered <- mss_interactions[mss_interactions$combined_score >= 150, ]  # Filtramos interacciones con una puntuación combinada >= 150 para MSS.
+
+# Creamos los grafos
+cat("Creando grafos para PD y MSS...\n")  # Indicamos que se están creando los grafos.
+pd_graph <- if (nrow(pd_interactions_filtered) > 0) {  # Si hay interacciones filtradas para PD:
+  graph_from_data_frame(pd_interactions_filtered, directed = FALSE) %>%  # Creamos un grafo no dirigido a partir de los datos.
+    simplify(remove.multiple = TRUE, remove.loops = TRUE)  # Simplificamos el grafo eliminando bucles y enlaces múltiples.
+} else {
+  NULL  # Si no hay interacciones, devolvemos NULL.
+}
+
+mss_graph <- if (nrow(mss_interactions_filtered) > 0) {  # Si hay interacciones filtradas para MSS:
+  graph_from_data_frame(mss_interactions_filtered, directed = FALSE) %>%  # Creamos un grafo no dirigido a partir de los datos.
+    simplify(remove.multiple = TRUE, remove.loops = TRUE)  # Simplificamos el grafo eliminando bucles y enlaces múltiples.
+} else {
+  NULL  # Si no hay interacciones, devolvemos NULL.
+}
+
+# Visualizamos los grafos
+if (!is.null(pd_graph) && vcount(pd_graph) > 0) {  # Si el grafo de PD no es NULL y tiene nodos:
+  cat("Visualizando red de PD...\n")  # Indicamos que se está visualizando la red de PD.
+  ggraph(pd_graph, layout = "fr") +  # Usamos `ggraph` para generar el layout de la red de PD.
+    geom_edge_link(alpha = 0.8) +  # Dibujamos los enlaces con transparencia.
+    geom_node_point(color = "blue", size = 3) +  # Dibujamos los nodos en color azul.
+    labs(title = "Red de Interacción de PD") +  # Agregamos un título al gráfico.
+    theme_void()  # Establecemos un tema vacío para la visualización.
+} else {
+  cat("No se encontraron nodos en la red de PD.\n")  # Si no hay nodos, imprimimos un mensaje.
+}
+
+if (!is.null(mss_graph) && vcount(mss_graph) > 0) {  # Si el grafo de MSS no es NULL y tiene nodos:
+  cat("Visualizando red de MSS...\n")  # Indicamos que se está visualizando la red de MSS.
+  ggraph(mss_graph, layout = "fr") +  # Usamos `ggraph` para generar el layout de la red de MSS.
+    geom_edge_link(alpha = 0.8) +  # Dibujamos los enlaces con transparencia.
+    geom_node_point(color = "red", size = 3) +  # Dibujamos los nodos en color rojo.
+    labs(title = "Red de Interacción de MSS") +  # Agregamos un título al gráfico.
+    theme_void()  # Establecemos un tema vacío para la visualización.
+} else {
+  cat("No se encontraron nodos en la red de MSS.\n")  # Si no hay nodos, imprimimos un mensaje.
+}
+
+
+```
+
+**Interpretación de los resultados**
+
+Los grafos generados para los grupos **PD** y **MSS** muestran las redes de interacción proteína-proteína con el umbral menos estricto implementado.
+
+**Red de Interacción de PD**
+
+- La red muestra una estructura conectada con varios nodos interactuando directamente. 
+
+- En el grupo PD, las proteínas parecen participar en un conjunto bien definido de interacciones, lo que podría indicar una funcionalidad centralizada en rutas biológicas específicas. Esto es consistente con un perfil de fosfoproteínas con roles clave en procesos tumorales, como la proliferación, la señalización celular o la angiogénesis.
+
+**Red de Interacción de MSS**
+
+- La red del grupo MSS tiene una estructura más dispersa con pequeños componentes conectados (grupos de 2-3 nodos como máximo).
+
+- La dispersión sugiere una falta de centralización en las interacciones, posiblemente indicando un papel más diversificado o específico de las proteínas en MSS. Esto podría correlacionarse con un perfil tumoral menos agresivo o con interacciones más moduladas en vías relacionadas con la homeostasis celular.
+
+
+```{r enrichment_graphs, message = FALSE, warning = FALSE, echo=FALSE}
+
+# Creamos una función para analizar y visualizar comunidades
+analyze_and_plot_communities <- function(graph, group_name) {
+  if (!is.null(graph) && vcount(graph) > 0) {  # Verificamos que el grafo no sea NULL y que tenga nodos.
+    cat("Detectando comunidades en la red de", group_name, "...\n")  # Indicamos que se está detectando comunidades en la red.
+    communities <- cluster_fast_greedy(graph)  # Detectamos comunidades en el grafo usando el algoritmo de agrupamiento rápido (fast greedy).
+    V(graph)$community <- membership(communities)  # Asignamos la comunidad correspondiente a cada nodo del grafo.
+    
+    cat("Número de comunidades en", group_name, ":", length(communities), "\n")  # Imprimimos el número total de comunidades detectadas.
+    
+    # Visualizamos las comunidades en el grafo
+    ggraph(graph, layout = "fr") +  # Usamos `ggraph` para generar un layout de tipo Fruchterman-Reingold.
+      geom_edge_link(alpha = 0.8) +  # Dibujamos los enlaces con transparencia.
+      geom_node_point(aes(color = factor(V(graph)$community)), size = 3) +  # Dibujamos los nodos coloreados por comunidad.
+      labs(title = paste("Comunidades en la Red de", group_name)) +  # Asignamos un título al gráfico.
+      theme_void()  # Aplicamos un tema vacío para simplificar la visualización.
+  } else {
+    cat("No se encontró una red válida para", group_name, "\n")  # Si no hay grafo válido, imprimimos un mensaje de error.
+  }
+}
+
+# Creamos una función para priorizar nodos clave
+prioritize_proteins <- function(graph, group_name) {
+  if (!is.null(graph) && vcount(graph) > 0) {  # Verificamos que el grafo no sea NULL y que tenga nodos.
+    cat("Priorizando proteínas clave en la red de", group_name, "...\n")  # Indicamos que estamos priorizando nodos clave.
+    
+    # Calculamos las métricas de centralidad
+    degree_values <- degree(graph)  # Calculamos los valores de conectividad (degree) de cada nodo.
+    betweenness_values <- betweenness(graph)  # Calculamos los valores de intermediación (betweenness) de cada nodo.
+    
+    # Identificamos top proteínas por grado
+    top_degree <- names(sort(degree_values, decreasing = TRUE)[1:5])  # Ordenamos nodos por conectividad descendente y seleccionamos los 5 primeros.
+    cat("Proteínas con mayor conectividad (grado) en", group_name, ":\n", top_degree, "\n")  # Imprimimos los nodos más conectados.
+    
+    # Identificamos top proteínas por intermediación (betweenness)
+    top_betweenness <- names(sort(betweenness_values, decreasing = TRUE)[1:5])  # Ordenamos nodos por intermediación descendente y seleccionamos los 5 primeros.
+    cat("Proteínas con mayor intermediación (betweenness) en", group_name, ":\n", top_betweenness, "\n")  # Imprimimos los nodos con mayor intermediación.
+    
+    return(list(  # Devolvemos un listado con los resultados.
+      degree = degree_values,  # Valores de conectividad (degree) de todos los nodos.
+      betweenness = betweenness_values,  # Valores de intermediación (betweenness) de todos los nodos.
+      top_degree = top_degree,  # Los 5 nodos con mayor conectividad.
+      top_betweenness = top_betweenness  # Los 5 nodos con mayor intermediación.
+    ))
+  } else {
+    cat("No se encontró una red válida para", group_name, "\n")  # Si no hay grafo válido, imprimimos un mensaje de error.
+    return(NULL)  # Devolvemos NULL si no hay grafo válido.
+  }
+}
+
+# Análisis para PD
+cat("\nAnálisis de la red de PD:\n")  # Indicamos que comenzamos el análisis de la red de PD.
+analyze_and_plot_communities(pd_graph, "PD")  # Analizamos y visualizamos las comunidades en la red de PD.
+pd_priorities <- prioritize_proteins(pd_graph, "PD")  # Priorizamos los nodos clave en la red de PD.
+
+# Análisis para MSS
+cat("\nAnálisis de la red de MSS:\n")  # Indicamos que comenzamos el análisis de la red de MSS.
+analyze_and_plot_communities(mss_graph, "MSS")  # Analizamos y visualizamos las comunidades en la red de MSS.
+mss_priorities <- prioritize_proteins(mss_graph, "MSS")  # Priorizamos los nodos clave en la red de MSS.
+
+# Comparación de redes
+cat("\nComparación entre redes PD y MSS:\n")  # Indicamos que comenzamos la comparación entre redes.
+if (!is.null(pd_graph) && !is.null(mss_graph)) {  # Verificamos que ambas redes sean válidas.
+  cat("Densidad de la red PD:", edge_density(pd_graph), "\n")  # Calculamos e imprimimos la densidad de la red de PD.
+  cat("Densidad de la red MSS:", edge_density(mss_graph), "\n")  # Calculamos e imprimimos la densidad de la red de MSS.
+} else {
+  cat("Una o ambas redes no son válidas para comparación.\n")  # Si una o ambas redes son inválidas, imprimimos un mensaje de error.
+}
+
+
+
+```
+
+**Interpretación de los resultados**
+
+**Interpretación de las Redes de Interacción**
+
+1. **Red de PD**:
+
+   - **Estructura**: La red de PD presenta 3 comunidades claramente definidas. Esto puede interpretarse como subgrupos funcionales de proteínas que trabajan juntas dentro de rutas biológicas específicas.
+   
+   - **Proteínas clave**:
+   
+     - Las proteínas identificadas con mayor conectividad (grado) son nodos centrales que podrían estar involucrados en procesos biológicos cruciales relacionados con la tumorigénesis en PD.
+     
+     - Las proteínas con mayor intermediación (betweenness) actúan como “puentes” entre comunidades. Su papel es esencial en la integración y transmisión de señales entre rutas funcionales diferentes.
+     
+   - **Densidad**: La densidad de la red PD es moderada (0.29). Esto indica una conectividad funcional relevante pero no excesivamente compleja, lo que podría estar relacionado con mecanismos biológicos específicos.
+
+2. **Red de MSS**:
+
+   - **Estructura**: La red de MSS tiene 2 comunidades, pero su estructura es más dispersa y menos conectada. Esto podría sugerir interacciones menos centralizadas o roles funcionales más específicos de las proteínas en MSS.
+   
+   - **Proteínas clave**:
+   
+     - Las proteínas con mayor conectividad (grado) probablemente desempeñan funciones específicas dentro de sus comunidades locales.
+     - Las proteínas con alta intermediación son cruciales para la comunicación entre los nodos dispersos. Pueden ser puntos estratégicos para intervenir en procesos asociados con MSS.
+     
+   - **Densidad**: La red MSS tiene una densidad similar a la red PD (0.3). Esto sugiere que aunque las redes son menos densas globalmente, las interacciones significativas están presentes y podrían representar rutas específicas asociadas al fenotipo tumoral MSS.
+
+
+**Comparación entre Redes PD y MSS**
+
+1. **Número de comunidades**:
+
+   - La red PD tiene un número mayor de comunidades (3) en comparación con MSS (2). Esto puede sugerir que las proteínas en PD participan en una mayor variedad de procesos funcionales o rutas biológicas.
+   - En MSS, la menor cantidad de comunidades y la estructura más dispersa pueden indicar un fenotipo menos heterogéneo en comparación con PD.
+
+2. **Distribución de centralidad**:
+
+   - En PD, las proteínas clave con mayor conectividad e intermediación están más diversificadas. Esto puede estar relacionado con un sistema más dinámico de interacciones.
+   - En MSS, las proteínas clave muestran una conectividad más localizada, posiblemente reflejando procesos más específicos y menos integradores.
+
+3. **Densidad**:
+
+   - Las densidades similares (0.29 en PD y 0.3 en MSS) sugieren que ambas redes tienen un nivel comparable de conectividad relativa. Sin embargo, las diferencias en estructura y número de comunidades reflejan diferentes patrones de organización funcional.
+
+
+**Implicaciones Biológicas**
+
+1. **PD**:
+   - Las proteínas con alta conectividad e intermediación pueden ser buenos candidatos para intervenciones terapéuticas, ya que podrían influir significativamente en la red.
+   - Las comunidades identificadas podrían representar rutas críticas en la progresión del cáncer en PD, como la proliferación celular, la angiogénesis o la evasión inmune.
+
+2. **MSS**:
+   - La estructura más dispersa y el menor número de comunidades sugieren que las proteínas de MSS podrían estar relacionadas con procesos tumorales menos agresivos o más especializados.
+   - Las proteínas clave en MSS podrían ser relevantes para entender mecanismos específicos de resistencia tumoral o funciones homeostáticas.
+
+
+**Limitaciones**:
+
+   - Los análisis no incluyen enriquecimiento funcional debido a la ausencia de resultados concretos en este aspecto. Esto limita la interpretación funcional de las comunidades identificadas.
+   
+   - El uso exclusivo de métricas de centralidad (grado e intermediación) es una aproximación básica que podría complementarse con otros análisis, como modularidad o clustering.
+
+
+---
+
+##### **Paso 5:Código para Validación de Biomarcadores**
+
+Este paso tiene como objetivo validar los biomarcadores identificados utilizando bases de datos públicas como **Human Protein Atlas (HPA)** y **PubMed**. Esto permite confirmar la relevancia clínica y científica de los fosfopéptidos en el contexto de su expresión en tejidos específicos y su relación con diferentes tipos de cáncer.
+
+
+
+##### **Paso 5.1: Exploración en Human Protein Atlas**
+
+En este análisis, se aprovechan los **UniProt IDs** para consultar su equivalente en **ENSG IDs** utilizando la herramienta **biomaRt**. Esto nos permite extraer información sobre la expresión de las proteínas correspondientes a los fosfopéptidos en tejidos específicos y evaluar su relevancia en distintos tipos de cáncer a través de la base de datos **Human Protein Atlas (HPA)**.
+
+**Pasos a Seguir**
+
+1. Convertimos los **UniProt IDs** a **ENSG IDs** mediante **biomaRt**.
+
+2. Consultamos la base de datos **Human Protein Atlas** utilizando los ENSG IDs obtenidos.
+
+3. Resumimos y estructuramos los resultados en un formato claro y organizado.
+
+
+```{r message = FALSE, warning = FALSE, echo=FALSE}
+
+# Cargamos las bibliotecas necesarias
+library(biomaRt)
+library(httr)
+library(xml2)
+
+# **Paso 1: Convertimos UniProt IDs a ENSG IDs usando biomaRt**
+# Inicializamos biomaRt con Ensembl
+ensembl <- useMart("ensembl", dataset = "hsapiens_gene_ensembl")
+
+# Creamos una función para convertir UniProt IDs a ENSG IDs
+convert_uniprot_to_ensg <- function(uniprot_ids) {
+  tryCatch({
+    result <- getBM(
+      attributes = c("uniprotswissprot", "ensembl_gene_id"),
+      filters = "uniprotswissprot",
+      values = uniprot_ids,
+      mart = ensembl
+    )
+    return(result)
+  }, error = function(e) {
+    cat("Error al mapear UniProt IDs:", e$message, "\n")
+    return(NULL)
+  })
+}
+
+# Normalizamos UniProt IDs eliminando sufijos
+normalized_pd_ids <- unique(gsub("\\..*", "", pd_ids))
+normalized_mss_ids <- unique(gsub("\\..*", "", mss_ids))
+
+# Convertimos UniProt IDs a ENSG IDs
+cat("Convirtiendo UniProt IDs de PD y MSS a ENSG IDs...\n")
+pd_id_mapping <- convert_uniprot_to_ensg(normalized_pd_ids)
+mss_id_mapping <- convert_uniprot_to_ensg(normalized_mss_ids)
+
+# Extraemos ENSG IDs
+pd_ensg_ids <- pd_id_mapping$ensembl_gene_id
+mss_ensg_ids <- mss_id_mapping$ensembl_gene_id
+
+# Mostramos los mapeos
+cat("Mapeos de PD:\n")
+print(pd_id_mapping)
+cat("Mapeos de MSS:\n")
+print(mss_id_mapping)
+
+# **Paso 2: Consultamos Human Protein Atlas usando ENSG IDs**
+# Creamos una función para consultar Human Protein Atlas
+query_hpa_xml <- function(ensg_id) {
+  base_url <- "https://www.proteinatlas.org/"
+  url <- paste0(base_url, ensg_id, ".xml")
+  
+  response <- tryCatch({
+    GET(url)
+  }, error = function(e) {
+    cat("Error al consultar la URL:", url, "\nMensaje de error:", e$message, "\n")
+    return(NULL)
+  })
+  
+  if (http_status(response)$category == "Success") {
+    xml_content <- content(response, as = "text", encoding = "UTF-8")
+    parsed_xml <- read_xml(xml_content)
+    return(parsed_xml)
+  } else {
+    cat("Error en la consulta para", ensg_id, "con código de estado:", http_status(response)$status, "\n")
+    return(NULL)
+  }
+}
+
+# Consultamos Human Protein Atlas para PD y MSS
+cat("Consultando Human Protein Atlas para PD...\n")
+pd_hpa_results <- lapply(pd_ensg_ids, query_hpa_xml)
+
+cat("Consultando Human Protein Atlas para MSS...\n")
+mss_hpa_results <- lapply(mss_ensg_ids, query_hpa_xml)
+
+# **Paso 3: Resumimos y Organizamos los Resultados**
+# Creamos una función para estructurar los resultados en un data frame
+summarize_hpa_results <- function(hpa_results, ensg_ids) {
+  summaries <- lapply(seq_along(ensg_ids), function(i) {
+    ensg_id <- ensg_ids[i]
+    if (!is.null(hpa_results[[i]])) {
+      tissues <- xml_find_all(hpa_results[[i]], "//tissue")
+      expressions <- xml_find_all(hpa_results[[i]], "//expression")
+      data.frame(
+        ENSG_ID = ensg_id,
+        Tissues = paste(xml_text(tissues), collapse = "; "),
+        ExpressionLevels = paste(xml_text(expressions), collapse = "; "),
+        stringsAsFactors = FALSE
+      )
+    } else {
+      data.frame(
+        ENSG_ID = ensg_id,
+        Tissues = "No se encontraron resultados",
+        ExpressionLevels = "No disponible",
+        stringsAsFactors = FALSE
+      )
+    }
+  })
+  return(do.call(rbind, summaries))
+}
+
+# Creamos los resúmenes para PD y MSS
+pd_summary <- summarize_hpa_results(pd_hpa_results, pd_ensg_ids)
+mss_summary <- summarize_hpa_results(mss_hpa_results, mss_ensg_ids)
+
+# Mostramos los resúmenes
+cat("\nResumen de Human Protein Atlas para PD:\n")
+print(pd_summary)
+
+cat("\nResumen de Human Protein Atlas para MSS:\n")
+print(mss_summary)
+
+
+```
+
+##### **Paso 5.2: Búsquedas en PubMed**
+
+Este paso emplea la API de Entrez para buscar artículos científicos en **PubMed** que estén relacionados con los biomarcadores identificados. Se utiliza el término de búsqueda generado a partir de los UniProt IDs, buscando su conexión con cáncer y fosforilación.
+
+**Pasos a Seguir**
+
+1. Configuramos la clave API de Entrez, para ello primero nos hemos creado una clave API en NCBI.
+
+2. Realizamos búsquedas en PubMed para los **UniProt IDs** de PD y MSS.
+
+3. Organizamos y mostramos los resultados de las búsquedas.
+
+
+```{r message = FALSE, warning = FALSE, echo=FALSE}
+
+# Configuramos la clave de API de NCBI
+Sys.setenv(ENTREZ_KEY = "a364c28db4174c78f78720bd6339d5af7d08")
+# Configura la clave de API necesaria para acceder a la API de Entrez de NCBI 
+# Garantiza un acceso más rápido y permite un mayor número de solicitudes
+
+# Verificamos que la clave se haya configurado correctamente
+if (Sys.getenv("ENTREZ_KEY") == "a364c28db4174c78f78720bd6339d5af7d08") {
+  cat("Clave API configurada correctamente.\n")
+} else {
+  cat("Hubo un problema configurando la clave API.\n")
+}
+# Comprueba que la clave de API se configuró correctamente en el entorno del sistema
+# Si no coincide con la clave proporcionada, se muestra un mensaje de error
+
+# Cargamos las bibliotecas necesarias
+library(rentrez)
+# Carga el paquete `rentrez`, que permite realizar búsquedas y recuperar datos de la API de Entrez (PubMed y otras bases de datos de NCBI)
+
+# Creamos una función para realizar búsqueda en PubMed
+search_pubmed <- function(query) {
+  tryCatch({
+    search_result <- entrez_search(db = "pubmed", term = query, retmax = 5)
+    # Realiza una búsqueda en la base de datos PubMed utilizando la API de Entrez
+    # `term` es el término de búsqueda (query), y `retmax` limita el número de resultados a 5
+    
+    if (length(search_result$ids) > 0) {
+      articles <- entrez_summary(db = "pubmed", id = search_result$ids)
+      # Recupera un resumen (título, autores, fecha, etc.) de los artículos encontrados a partir de sus IDs
+      return(articles)
+    } else {
+      return(NULL)
+      # Si no se encuentran resultados, la función devuelve `NULL`
+    }
+  }, error = function(e) {
+    message("Error al realizar la búsqueda en PubMed: ", e$message)
+    # Captura errores que puedan ocurrir durante la búsqueda y muestra un mensaje en la consola
+    return(NULL)
+  })
+}
+
+# Realizamos búsquedas para IDs de PD normalizados
+cat("Buscando en PubMed para PD...\n")
+pd_pubmed_results <- list()
+# Inicializa una lista vacía para almacenar los resultados de las búsquedas en PubMed para PD
+
+for (id in normalized_pd_ids) {
+  query <- paste(id, "cancer OR tumor OR phosphorylation", sep = " ")
+  # Construye la consulta (query) para PubMed combinando cada UniProt ID con términos relevantes (cáncer, tumor, fosforilación)
+  
+  pd_pubmed_results[[id]] <- search_pubmed(query)
+  # Almacena los resultados de la búsqueda en la lista `pd_pubmed_results`, indexados por cada UniProt ID
+}
+
+# Realizamos búsquedas para IDs de MSS normalizados
+cat("Buscando en PubMed para MSS...\n")
+mss_pubmed_results <- list()
+# Inicializa una lista vacía para almacenar los resultados de las búsquedas en PubMed para MSS
+
+for (id in normalized_mss_ids) {
+  query <- paste(id, "cancer OR tumor OR phosphorylation", sep = " ")
+  # Construye la consulta (query) para PubMed combinando cada UniProt ID con términos relevantes (cáncer, tumor, fosforilación)
+  
+  mss_pubmed_results[[id]] <- search_pubmed(query)
+  # Almacena los resultados de la búsqueda en la lista `mss_pubmed_results`, indexados por cada UniProt ID
+}
+
+# Mostramos los resultados de PubMed para PD
+cat("Resultados de PubMed para PD:\n")
+for (id in names(pd_pubmed_results)) {
+  if (!is.null(pd_pubmed_results[[id]]) && length(pd_pubmed_results[[id]]) > 0) {
+    cat("UniProt ID:", id, "\n")
+    # Imprime el UniProt ID para el que se encontraron resultados
+    
+    articles <- pd_pubmed_results[[id]]
+    # Extrae los artículos asociados con el UniProt ID actual
+    
+    for (article in articles) {
+      cat("Título:", article$title, "\n")
+      # Muestra el título del artículo
+      
+      # Convertimos autores a una cadena separada por comas
+      if (!is.null(article$authors)) {
+        cat("Autores:", paste(article$authors, collapse = ", "), "\n")
+        # Muestra la lista de autores, separada por comas
+      } else {
+        cat("Autores: No especificados\n")
+        # Indica si no hay información sobre los autores
+      }
+      
+      cat("Fecha:", article$pubdate, "\n")
+      # Muestra la fecha de publicación del artículo
+      
+      cat("Resumen:", article$summary, "\n\n")
+      # Muestra el resumen del artículo
+    }
+  } else {
+    cat("No se encontraron resultados en PubMed para UniProt ID:", id, "\n")
+    # Indica que no se encontraron resultados para el UniProt ID actual
+  }
+}
+
+# Mostramos los resultados de PubMed para MSS
+cat("Resultados de PubMed para MSS:\n")
+for (id in names(mss_pubmed_results)) {
+  if (!is.null(mss_pubmed_results[[id]]) && length(mss_pubmed_results[[id]]) > 0) {
+    cat("UniProt ID:", id, "\n")
+    # Imprime el UniProt ID para el que se encontraron resultados
+    
+    articles <- mss_pubmed_results[[id]]
+    # Extrae los artículos asociados con el UniProt ID actual
+    
+    for (article in articles) {
+      cat("Título:", article$title, "\n")
+      # Muestra el título del artículo
+      
+      # Convertimos autores a una cadena separada por comas
+      if (!is.null(article$authors)) {
+        cat("Autores:", paste(article$authors, collapse = ", "), "\n")
+        # Muestra la lista de autores, separada por comas
+      } else {
+        cat("Autores: No especificados\n")
+        # Indica si no hay información sobre los autores
+      }
+      
+      cat("Fecha:", article$pubdate, "\n")
+      # Muestra la fecha de publicación del artículo
+      
+      cat("Resumen:", article$summary, "\n\n")
+      # Muestra el resumen del artículo
+    }
+  } else {
+    cat("No se encontraron resultados en PubMed para UniProt ID:", id, "\n")
+    # Indica que no se encontraron resultados para el UniProt ID actual
+  }
+}
+
+
+
+```
+
+**Interpretación de los resultados**
+
+**Grupo PD**
+
+En el grupo PD, los fosfopéptidos más abundantes, según los análisis de **Human Protein Atlas** y **PubMed**, muestran un perfil altamente activo en tejidos clave y en procesos moleculares asociados a la proliferación tumoral agresiva y la evasión inmune. Los resultados sugieren una activación de mecanismos relacionados con la progresión tumoral y la resistencia terapéutica.
+
+- **Alta expresión en tejidos tumorales relevantes**: Los genes asociados a fosfopéptidos como **ENSG00000141867** y **ENSG00000188529** presentan niveles significativos de expresión en tejidos como hígado, colon y pulmón. Estos tejidos están comúnmente afectados en subtipos tumorales agresivos, indicando que las proteínas relacionadas podrían ser críticas en la biología de los tumores PD.
+
+- **Asociación con procesos angiogénicos y proliferativos**: Los genes mapeados en PubMed están implicados en rutas como la señalización de VEGF y la regulación del ciclo celular, lo que sugiere un aumento en la capacidad de formar nuevos vasos sanguíneos y soportar un crecimiento tumoral descontrolado.
+
+- **Evasión inmune**: Los resultados en PubMed también señalan la participación de estos genes en mecanismos de evasión inmune, como la vía de **PD-L1/PD-1**, utilizada por las células tumorales para inhibir la respuesta inmunológica y facilitar su supervivencia en un entorno hostil.
+
+- **Resistencia a estrés celular y terapias**: La asociación de estos genes con procesos de respuesta a estrés celular, como la señalización por receptores tipo RIG-I, destaca su posible rol en la resistencia a terapias y en la promoción de un ambiente tumoral resiliente.
+
+En conjunto, los resultados para el grupo PD refuerzan su perfil como un subtipo tumoral altamente **proliferativo**, con capacidad para **evadir respuestas inmunes** y soportar condiciones adversas, lo que lo convierte en un objetivo atractivo para terapias dirigidas.
+
+
+**Grupo MSS**
+
+En el grupo MSS, los fosfopéptidos más abundantes se caracterizan por un perfil menos agresivo, con una mayor inclinación hacia la regulación celular estable y una interacción equilibrada con el entorno. Los resultados de **Human Protein Atlas** y **PubMed** resaltan la activación de mecanismos de señalización menos asociados a la progresión tumoral.
+
+- **Expresión moderada en tejidos específicos**: Los genes asociados a fosfopéptidos de MSS, como **ENSG00000273594** y **ENSG00000157992**, muestran una expresión distribuida en tejidos como cerebro y ganglios linfáticos, sugiriendo un perfil tumoral menos invasivo y posiblemente regulado.
+
+- **Asociación con procesos neuronales y metabólicos**: Los análisis en PubMed destacan rutas como la señalización dopaminérgica y el metabolismo de cAMP, que podrían estar relacionadas con una regulación más fina de las respuestas celulares al entorno, en lugar de un comportamiento proliferativo agresivo.
+
+- **Mantenimiento de la homeostasis celular**: La activación de rutas vinculadas a la señalización celular homeostática y la ausencia de asociación con procesos de evasión inmune agresiva sugieren que MSS representa un subtipo tumoral más balanceado y menos propenso a la progresión rápida.
+
+Los resultados para MSS sugieren que este subtipo tumoral tiene un comportamiento menos agresivo, con una **capacidad de regulación celular y estabilidad** que lo distingue significativamente de PD.
+
+
+**Conclusión**
+
+- **PD**: Los fosfopéptidos asociados a PD destacan como candidatos prometedores para biomarcadores y dianas terapéuticas debido a su participación en procesos críticos como la angiogénesis, proliferación tumoral y evasión inmune. Esto refuerza el perfil agresivo de PD y su necesidad de estrategias terapéuticas específicas.
+
+- **MSS**: Los fosfopéptidos en MSS tienen un perfil más estable, con una orientación hacia la regulación celular y la homeostasis. Esto podría limitar su potencial como biomarcadores de agresividad, pero los hace relevantes para entender las diferencias biológicas entre subtipos tumorales.
+
+
